@@ -66,3 +66,27 @@ sources:
       time:
         css: "span.event-time"
         methods: "text"
+  - name: Museum London
+    abbrev: ML
+    tags:
+      - Downtown
+      - Culture
+    #url: https://museumlondon.ca/programs-events
+    url: ml.html
+    finders:
+      main:
+        css: div.event
+      event:
+        css: div.col-xs-9
+      link:
+        css: a.num
+        attr: href
+        methods: value
+      title:
+        css: a.num h3
+        methods: text
+      datetime:
+        css: span.event-date
+        methods: text
+        # remove leading day of the week
+        remove: "^\\S+ "

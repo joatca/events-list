@@ -47,10 +47,10 @@ class EventFetcher
   def extract(from, spec)
     begin
       item = from
-      if spec.has_key?("css")
+      if spec["css"]
         item = item.css(spec["css"])
       end
-      if spec.has_key?("attr")
+      if spec["attr"]
         item = item.attribute(spec["attr"])
       end
       ensure_array(spec["methods"]).each do |method|
@@ -66,13 +66,17 @@ class EventFetcher
   end
 
   def extract_time(from, spec)
+    puts "get time from #{from.inspect} using #{spec}"
     timetext = ""
-    if spec.has_key?("date")
+    if spec["date"]
+      puts " using date"
       timetext += extract(from, spec["date"])
-      if spec.has_key?("time")
+      if spec["time"]
+        puts " using time"
         timetext += " " + extract(from, spec["time"])
       end
-    elsif spec.has_key?("datetime")
+    elsif spec["datetime"]
+      puts " using datetime"
       timetext += extract(from, spec["datetime"])
     else
       raise "bad date and time spec #{spec.inspect}"
@@ -84,6 +88,7 @@ class EventFetcher
 end
 
 config = YAML.load(File.read("event-list-config.yaml"))
+p config
 events = []
 config["sources"].each do |source|
   fetcher = EventFetcher.new(source)

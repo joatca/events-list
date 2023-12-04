@@ -1,0 +1,17 @@
+GEM
+  remote: https://rubygems.org/
+  specs:
+    chronic (0.10.2)
+    nokogiri (1.15.5-x86_64-linux)
+      racc (~> 1.4)
+    racc (1.7.3)
+
+PLATFORMS
+  x86_64-linux
+
+DEPENDENCIES
+  chronic
+  nokogiri
+
+BUNDLED WITH
+   2.4.22

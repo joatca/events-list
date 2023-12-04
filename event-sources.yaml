@@ -1,0 +1,66 @@
+# in the finders below, `main` finds the document section containing the list of events, `events` finds the list
+# of events, and in each event, `link` finds the URL to the web page, `title` finds the title text, `date` finds
+# just the datetext, `time` just the time text, `datetime` finds both if they are smashed together`
+#
+# In each finder, `css` searches by CSS selector and `attr` fetches the element's attribute,
+# and the optional `methods` is a Nokogiri method to call on the returning value, either a string or array
+# 
+- name: Covent Garden Market
+  abbrev: CGM
+  tags:
+    - Municipal
+    - Downtown
+  #url: https://coventmarket.com/events/
+  url: "cgm.html"
+  finders:
+    main:
+      css: "section.tile-callout-cards"
+    event:
+      css: "div.grid-item a"
+    link:
+      attr: "href"
+      methods: "value"
+    title:
+      css: "h3.event-title"
+      methods: "text"
+    date:
+      css: "div.event-date-time strong"
+      methods: "text"
+      # removes the trailing end date
+      remove: "-.*$"
+    time:
+      css: "div.event-date-time div"
+      methods: "text"
+      # removes the trailed end time
+      remove: "-.*$"
+- name: Aeolian Hall
+  abbrev: AH
+  tags:
+    - Downtown
+    - Culture
+  #url: https://aeolianhall.ca/events/
+  url: "ah.html"
+  finders:
+    main:
+      css: "section.events-feed"
+    event:
+      css: "div.event-tile"
+    link:
+      css: "a.link-wrap"
+      attr: "href"
+      methods: "value"
+    title:
+      css: "div.event-title"
+      methods: "text"
+      # strips leading and trailing whitespace
+      remove:
+        - "^\\s+"
+        - "\\s+$"
+    date:
+      css: "span.event-date"
+      methods: "text"
+      # removes the leading day of the week
+      remove: "^\\S+ "
+    time:
+      css: "span.event-time"
+      methods: "text"

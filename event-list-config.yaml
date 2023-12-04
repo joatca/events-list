@@ -90,3 +90,55 @@ sources:
         methods: text
         # remove leading day of the week
         remove: "^\\S+ "
+  - name: London Music Hall
+    abbrev: LMH
+    tags:
+      - Downtown
+      - Culture
+    #url: http://londonmusichall.com/upcoming-events/
+    url: lmh.html
+    finders:
+      main:
+        css: div.events
+      event:
+        css: div.event
+      link:
+        css: div.event-info h2 a
+        attr: href
+        methods: value
+      title:
+        css: div.event-info h2 a
+        methods: text
+      date:
+        css: div.event-info div.date
+        methods: text
+      time:
+        css: div.event-info div.times
+        methods: text
+        # remove extraneous crap
+        remove:
+          - "Doors:"
+          - "/\\s*Show:.*$"
+  - name: Budweiser Gardens
+    abbrev: BG
+    tags:
+      - Downtown
+    #url: https://www.budweisergardens.com/events
+    url: bg.html
+    finders:
+      main:
+        css: div.m-eventList
+      event:
+        css: div.m-eventItem
+      link:
+        css: h3.m-eventItem__title
+        attr: href
+        methods: value
+      title:
+        css: h3.m-eventItem__title
+        methods: text
+      date:
+        css: div.m-eventItem__date
+        methods: text
+        # remove last word (day of week)
+        remove: "\\S+\\s*$"

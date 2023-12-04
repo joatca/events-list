@@ -83,9 +83,9 @@ class EventFetcher
   end
 end
 
-sources = YAML.load(File.read("event-sources.yaml"))
+config = YAML.load(File.read("event-list-config.yaml"))
 events = []
-sources.each do |source|
+config["sources"].each do |source|
   fetcher = EventFetcher.new(source)
   fetcher.each do |event|
     events << event

@@ -5,7 +5,7 @@
 # In each finder, `css` searches by CSS selector and `attr` fetches the element's attribute,
 # and the optional `methods` is a Nokogiri method to call on the returning value, either a string or array
 #
-output_dir: out
+output_file: out/index.md
 sources:
   - name: Covent Garden Market
     abbrev: CGM
@@ -135,7 +135,7 @@ sources:
         attr: href
         methods: value
       title:
-        css: h3.m-eventItem__title
+        css: h3.m-eventItem__title a
         methods: text
       date:
         css: div.m-eventItem__date

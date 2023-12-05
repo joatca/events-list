@@ -92,4 +92,25 @@ config["sources"].each do |source|
   end
 end
 
-puts events.select { |e| e.time >= Time.now - 86400 }.sort { |a, b| a.time <=> b.time }.join("\n")
+now = Time.now
+earliest = now - 86400 # yesterday
+latest = earliest + 86400 * 180 # 6 months
+
+cur_date = nil
+File.open(config["output_file"], "w") do |out|
+  out.puts <<-HEADER
+  ---
+  title: "Events"
+  date: #{ now.iso8601 }
+  draft: false
+  ---
+  _Last updated #{now}_
+
+  | When | Venue | Event |
+  |------|-------|-------|
+  HEADER
+  events.select { |e| e.time >= earliest && e.time < latest }.sort { |a, b| a.time <=> b.time }.each do |e|
+    out.puts "| #{ e.time } | #{ e.abbrev } | #{ e.title } |"
+  end
+end
+

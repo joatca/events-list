@@ -5,7 +5,8 @@
 # In each finder, `css` searches by CSS selector and `attr` fetches the element's attribute,
 # and the optional `methods` is a Nokogiri method to call on the returning value, either a string or array
 #
-output_file: out/index.md
+output_file: ../event-list-site/content/index.md
+abbrev_file: ../event-list-site/content/about.md
 sources:
   - name: Covent Garden Market
     abbrev: CGM
@@ -14,6 +15,7 @@ sources:
       - Downtown
     #url: https://coventmarket.com/events/
     url: "cgm.html"
+    home: https://coventmarket.com/
     finders:
       main:
         css: "section.tile-callout-cards"
@@ -42,6 +44,7 @@ sources:
       - Culture
     #url: https://aeolianhall.ca/events/
     url: "ah.html"
+    home: https://aeolianhall.ca/
     finders:
       main:
         css: "section.events-feed"
@@ -73,6 +76,7 @@ sources:
       - Culture
     #url: https://museumlondon.ca/programs-events
     url: ml.html
+    home: https://museumlondon.ca/
     finders:
       main:
         css: div.event
@@ -97,6 +101,7 @@ sources:
       - Culture
     #url: http://londonmusichall.com/upcoming-events/
     url: lmh.html
+    home: http://londonmusichall.com/
     finders:
       main:
         css: div.events
@@ -125,6 +130,7 @@ sources:
       - Downtown
     #url: https://www.budweisergardens.com/events
     url: bg.html
+    home: https://www.budweisergardens.com/
     finders:
       main:
         css: div.m-eventList

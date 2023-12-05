@@ -106,22 +106,60 @@ end
 now = Time.now
 earliest = now - 86400 # yesterday
 latest = earliest + 86400 * 180 # 6 months
-
-cur_date = nil
 File.open(config["output_file"], "w") do |out|
-  out.puts <<-HEADER
-  ---
-  title: "Events"
-  date: #{ now.iso8601 }
-  draft: false
-  ---
-  _Last updated #{now}_
+  out.puts <<HEADER
+---
+title: "Events"
+date: #{ now.iso8601 }
+draft: false
+---
 
-  | When | Venue | Event |
-  |------|-------|-------|
-  HEADER
+| When  |  | Event (Venue) |
+|------:|-:|:--------------|
+HEADER
+  cur_date = nil
   events.select { |e| e.time >= earliest && e.time < latest }.sort { |a, b| a.time <=> b.time }.each do |e|
-    out.puts "| #{ e.time } | #{ e.abbrev } | #{ e.title } |"
+    days_until = e.time.to_date - now.to_date
+    date = if days_until < 7
+             e.time.strftime("%A")
+           elsif e.time.year == now.year
+             e.time.strftime("%A %B %d")
+           else
+             e.time.strftime("%A %B %d %Y")
+           end
+    if date != cur_date
+      cur_date = date
+    else
+      date = ""
+    end
+    time = if e.time.hour == 0 && e.time.minute == 0
+             ""
+           else
+             e.time.strftime("%H:%M")
+           end
+    out.puts "| #{date} | #{time} | [#{e.title}](#{e.link}) ([#{e.abbrev}](/about##{e.abbrev})) |"
   end
+  out.puts <<FOOTER
+
+_Last updated #{now}_
+FOOTER
 end
 
+File.open(config["abbrev_file"], "w") do |out|
+  out.puts <<HEADER
+---
+title: "Abbreviations"
+date: #{ now.iso8601 }
+draft: false
+---
+
+| Abbreviation | Name |
+|--------------|------|
+HEADER
+  config["sources"].sort { |a, b| a["abbrev"] <=> b["abbrev"] }.each do |s|
+    out.puts "| #{s["abbrev"]} | [#{s["name"]}](#{s["home"]}) |"
+  end
+  out.puts <<FOOTER
+_Last updated #{now}_
+FOOTER
+end

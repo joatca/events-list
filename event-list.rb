@@ -34,8 +34,11 @@ class EventFetcher
 
   def each
     doc = Nokogiri::HTML(URI.open(@src["url"]))
+    #puts "reading #{@src["url"]}"
     main = extract(doc, @main).first
+    #puts "found main"
     extract(main, @event).each do |event|
+      #puts "found event"
       link = extract(event, @link)
       title = extract(event, @title)
       time = extract_time(event, @timespec)
@@ -64,8 +67,11 @@ class EventFetcher
       if spec["attr"]
         item = item.attribute(spec["attr"])
       end
+      puts "before methods: #{item.inspect} (#{spec["methods"]}) #{item.class}"
       ensure_array(spec["methods"]).each do |method|
+        puts " before method #{method}"
         item = item.send(method)
+        puts " after method #{method}: #{item.inspect}"
       end
       ensure_array(spec["remove"]).each do |remove|
         item.gsub!(/#{remove}/m, "")
@@ -153,13 +159,14 @@ date: #{ now.iso8601 }
 draft: false
 ---
 
-| Abbreviation | Name |
-|--------------|------|
+|   |       |
+|:--------------|:------|
 HEADER
   config["sources"].sort { |a, b| a["abbrev"] <=> b["abbrev"] }.each do |s|
-    out.puts "| #{s["abbrev"]} | [#{s["name"]}](#{s["home"]}) |"
+    out.puts "| **#{s["abbrev"]}** | [#{s["name"]}](#{s["home"]}) |"
   end
   out.puts <<FOOTER
+
 _Last updated #{now}_
 FOOTER
 end

@@ -9,7 +9,7 @@ output_file: ../event-list-site/content/index.md
 abbrev_file: ../event-list-site/content/about.md
 sources:
   - name: Covent Garden Market
-    abbrev: CGM
+    abbrev: Cov
     tags:
       - Municipal
       - Downtown
@@ -38,7 +38,7 @@ sources:
         # removes the trailed end time
         remove: "-.*$"
   - name: Aeolian Hall
-    abbrev: AH
+    abbrev: Aeol
     tags:
       - Downtown
       - Culture
@@ -70,7 +70,7 @@ sources:
         css: "span.event-time"
         methods: "text"
   - name: Museum London
-    abbrev: ML
+    abbrev: Mus
     tags:
       - Downtown
       - Culture
@@ -125,7 +125,7 @@ sources:
           - "Doors:"
           - "/\\s*Show:.*$"
   - name: Budweiser Gardens
-    abbrev: BG
+    abbrev: Bud
     tags:
       - Downtown
     #url: https://www.budweisergardens.com/events
@@ -148,3 +148,34 @@ sources:
         methods: text
         # remove last word (day of week)
         remove: "\\S+\\s*$"
+  - name: Wolf Performance Hall
+    abbrev: Wolf
+    tags:
+      - Downtown
+      - Culture
+    #url: https://www.lpl.ca/services-spaces/featured-spaces/wolf-performance-hall
+    url: wph.html
+    home: https://www.lpl.ca/services-spaces/featured-spaces/wolf-performance-hall
+    finders:
+      main:
+        css: div.views-view-grid
+      event:
+        css: a.teaser-card--event
+      link:
+        attr: href
+        methods: value
+      title:
+        attr: title
+        methods: value
+      date:
+        css: div.teaser-card__event-date div
+        methods:
+          - first
+          - text
+      time:
+        css: div.teaser-card__event-date div
+        methods:
+          - pop
+          - text
+        # remove end time
+        remove: "- \\s*.*"

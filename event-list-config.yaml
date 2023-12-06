@@ -137,7 +137,7 @@ sources:
       event:
         css: div.m-eventItem
       link:
-        css: h3.m-eventItem__title
+        css: h3.m-eventItem__title a
         attr: href
         methods: value
       title:

@@ -13,13 +13,13 @@ sources:
     tags:
       - Municipal
       - Downtown
-    #url: https://coventmarket.com/events/
-    url: "cgm.html"
+    url: https://coventmarket.com/events/
+    debug_url: "cgm.html"
     home: https://coventmarket.com/
     finders:
       main:
         css: "section.tile-callout-cards"
-      event:
+      events:
         css: "div.grid-item a"
       link:
         attr: "href"
@@ -42,13 +42,13 @@ sources:
     tags:
       - Downtown
       - Culture
-    #url: https://aeolianhall.ca/events/
-    url: "ah.html"
+    url: https://aeolianhall.ca/events/
+    debug_url: "ah.html"
     home: https://aeolianhall.ca/
     finders:
       main:
         css: "section.events-feed"
-      event:
+      events:
         css: "div.event-tile"
       link:
         css: "a.link-wrap"
@@ -74,13 +74,13 @@ sources:
     tags:
       - Downtown
       - Culture
-    #url: https://museumlondon.ca/programs-events
-    url: ml.html
+    url: https://museumlondon.ca/programs-events
+    debug_url: ml.html
     home: https://museumlondon.ca/
     finders:
       main:
         css: div.event
-      event:
+      events:
         css: div.col-xs-9
       link:
         css: a.num
@@ -99,13 +99,13 @@ sources:
     tags:
       - Downtown
       - Culture
-    #url: http://londonmusichall.com/upcoming-events/
-    url: lmh.html
+    url: http://londonmusichall.com/upcoming-events/
+    debug_url: lmh.html
     home: http://londonmusichall.com/
     finders:
       main:
         css: div.events
-      event:
+      events:
         css: div.event
       link:
         css: div.event-info h2 a
@@ -128,13 +128,13 @@ sources:
     abbrev: Bud
     tags:
       - Downtown
-    #url: https://www.budweisergardens.com/events
-    url: bg.html
+    url: https://www.budweisergardens.com/events
+    debug_url: bg.html
     home: https://www.budweisergardens.com/
     finders:
       main:
         css: div.m-eventList
-      event:
+      events:
         css: div.m-eventItem
       link:
         css: h3.m-eventItem__title a
@@ -153,13 +153,13 @@ sources:
     tags:
       - Downtown
       - Culture
-    #url: https://www.lpl.ca/services-spaces/featured-spaces/wolf-performance-hall
-    url: wph.html
+    url: https://www.lpl.ca/services-spaces/featured-spaces/wolf-performance-hall
+    debug_url: wph.html
     home: https://www.lpl.ca/services-spaces/featured-spaces/wolf-performance-hall
     finders:
       main:
         css: div.views-view-grid
-      event:
+      events:
         css: a.teaser-card--event
       link:
         attr: href
@@ -179,3 +179,32 @@ sources:
           - text
         # remove end time
         remove: "- \\s*.*"
+  - name: Don Wright Faculty of Music
+    abbrev: FMus
+    tags:
+      - Culture
+    url: http://www.events.westernu.ca/events/music/
+    debug_url: dwfm.html
+    home: http://www.events.westernu.ca/events/music/
+    finders:
+      main:
+        css: "div#mainCol"
+      date_containers:
+        css: div.day
+      date:
+        css: h2
+        methods: text
+        # remove leading day of week
+        remove: "^\\S+\\s+"
+      events:
+        css: div.detailColFull
+      link:
+        css: div.detailColRight a
+        attr: href
+        methods: value
+      title:
+        css: div.detailColRight a
+        methods: text
+      time:
+        css: div.detailColLeft
+        methods: text

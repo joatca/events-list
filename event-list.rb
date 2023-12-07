@@ -33,8 +33,8 @@ class EventFetcher
   end
 
   def each
-    doc = Nokogiri::HTML(URI.open(@debug_url || @url))
     puts "reading #{@url}"
+    doc = Nokogiri::HTML(URI.open(@debug_url || @url))
     main = extract(doc, @main).first
     if @date_containers
       # each date has a container with multiple timed events

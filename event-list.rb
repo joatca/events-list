@@ -140,6 +140,7 @@ end.parse!
 config = YAML.load(File.read("event-list-config.yaml"))
 events = []
 config["sources"].each do |source|
+  next unless source["url"]
   begin
     fetcher = EventFetcher.new(source, options[:debug])
     fetcher.each do |event|
@@ -202,11 +203,11 @@ draft: false
 
 This page currently supports events found on these sites.
 
-|   |       |
-|:--------------|:------|
+|   |       | |
+|:--------------|:------|:--|
 HEADER
   config["sources"].sort { |a, b| a["abbrev"] <=> b["abbrev"] }.each do |s|
-    out.puts "| **#{s["abbrev"]}** | [#{s["name"]}](#{s["home"]}) |"
+    out.puts "| **#{s["abbrev"]}** | [#{s["name"]}](#{s["home"]}) | #{s["note"] ? "*"+s["note"]+"*" : ""}"
   end
   out.puts <<FOOTER
 

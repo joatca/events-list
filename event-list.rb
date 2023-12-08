@@ -114,6 +114,8 @@ class EventFetcher
       timetext += extract(from, spec["date"])
       if spec["time"]
         timetext += " " + extract(from, spec["time"])
+      else
+        timetext += " 00:00:00"
       end
     elsif spec["datetime"]
       timetext += extract(from, spec["datetime"])
@@ -181,7 +183,7 @@ HEADER
     else
       date = ""
     end
-    time = if e.time.hour == 0 && e.time.minute == 0
+    time = if e.time.hour == 0 && e.time.min == 0
              ""
            else
              e.time.strftime("%H:%M")

@@ -5,8 +5,8 @@
 # In each finder, `css` searches by CSS selector and `attr` fetches the element's attribute,
 # and the optional `methods` is a Nokogiri method to call on the returning value, either a string or array
 #
-output_file: ../events-list-site/content/index.md
-abbrev_file: ../events-list-site/content/about.md
+output_file: ../events-list-site/content/_index.md
+abbrev_file: ../events-list-site/content/about/_index.md
 sources:
   - name: Covent Garden Market
     abbrev: Cov

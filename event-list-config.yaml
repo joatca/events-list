@@ -5,16 +5,16 @@
 # In each finder, `css` searches by CSS selector and `attr` fetches the element's attribute,
 # and the optional `methods` is a Nokogiri method to call on the returning value, either a string or array
 #
-output_file: ../event-list-site/content/index.md
-abbrev_file: ../event-list-site/content/about.md
+output_file: ../events-list-site/content/index.md
+abbrev_file: ../events-list-site/content/about.md
 sources:
   - name: Covent Garden Market
     abbrev: Cov
     tags:
       - Municipal
       - Downtown
-    url: https://coventmarket.com/events/
-    #debug_url: "cgm.html"
+    url: https://covenxtmarket.com/events/
+    debug_url: "cgm.html"
     home: https://coventmarket.com/
     finders:
       main:
@@ -43,7 +43,7 @@ sources:
       - Downtown
       - Culture
     url: https://aeolianhall.ca/events/
-    #debug_url: "ah.html"
+    debug_url: "ah.html"
     home: https://aeolianhall.ca/
     finders:
       main:
@@ -75,7 +75,7 @@ sources:
       - Downtown
       - Culture
     url: https://museumlondon.ca/programs-events
-    #debug_url: ml.html
+    debug_url: ml.html
     home: https://museumlondon.ca/
     finders:
       main:
@@ -100,7 +100,7 @@ sources:
       - Downtown
       - Culture
     url: http://londonmusichall.com/upcoming-events/
-    #debug_url: lmh.html
+    debug_url: lmh.html
     home: http://londonmusichall.com/
     finders:
       main:
@@ -129,7 +129,7 @@ sources:
     tags:
       - Downtown
     url: https://www.budweisergardens.com/events
-    #debug_url: bg.html
+    debug_url: bg.html
     home: https://www.budweisergardens.com/
     finders:
       main:
@@ -154,7 +154,7 @@ sources:
       - Downtown
       - Culture
     url: https://www.lpl.ca/services-spaces/featured-spaces/wolf-performance-hall
-    #debug_url: wph.html
+    debug_url: wph.html
     home: https://www.lpl.ca/services-spaces/featured-spaces/wolf-performance-hall
     finders:
       main:
@@ -184,7 +184,7 @@ sources:
     tags:
       - Culture
     url: http://www.events.westernu.ca/events/music/
-    #debug_url: dwfm.html
+    debug_url: dwfm.html
     home: http://www.events.westernu.ca/events/music/
     finders:
       main:

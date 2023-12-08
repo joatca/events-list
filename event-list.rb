@@ -11,6 +11,7 @@
 # You should have received a copy of the GNU General Public License along with this program. If not, see
 # <https://www.gnu.org/licenses/>.
 
+require 'optparse'
 require 'open-uri'
 require 'yaml'
 require 'nokogiri'
@@ -19,10 +20,10 @@ require 'chronic'
 Event = Struct.new('Event', :title, :abbrev, :link, :time, :tags)
 
 class EventFetcher
-  def initialize(src)
-    @src = src
-    @name, @abbrev, @tags, @url, @debug_url = [
-      "name", "abbrev", "tags", "url", "debug_url"
+  def initialize(src, debug = false)
+    @src, @debug = src, debug
+    @name, @abbrev, @tags, @url = [
+      "name", "abbrev", "tags", @debug ? "debug_url" : "url"
     ].map { |k| @src[k] }
     @main, @date_containers, @events, @link, @title = [
       "main", "date_containers", "events", "link", "title"
@@ -33,31 +34,31 @@ class EventFetcher
   end
 
   def each
-    puts "reading #{@url}"
-    doc = Nokogiri::HTML(URI.open(@debug_url || @url))
+    puts "reading #{@url}" if @debug
+    doc = Nokogiri::HTML(URI.open(@url))
     main = extract(doc, @main).first
     if @date_containers
       # each date has a container with multiple timed events
       c = extract(main, @date_containers)
-      puts "Found containers #{c.class}"
+      puts "Found containers #{c.class}" if @debug
       c.each do |container|
-        puts "found date container #{container.class}"
+        puts "found date container #{container.class}" if @debug
         date = extract(container, @timespec["date"])
-        puts "found date #{date} for container"
+        puts "found date #{date} for container" if @debug
         extract(container, @events).each do |event|
-          puts "found event #{event.class}"
-          link = URI::join(@url, extract(event, @link))
+          puts "found event #{event.class}" if @debug
+          raw_link = extract(event, @link)
+          link = @debug ? raw_link : URI::join(@url, raw_link)
           title = extract(event, @title).gsub(/\|/, '\|')
-          p title
           time = extract_time(event, @timespec, date)
-          p time
           yield Event.new(title, @abbrev, link, time, @tags)
         end
       end
     else
       extract(main, @events).each do |event|
-        #puts "found event"
-        link = URI::join(@url, extract(event, @link))
+        puts "found event" if @debug
+        raw_link = extract(event, @link)
+        link = @debug ? raw_link : URI::join(@url, raw_link)
         title = extract(event, @title).gsub(/\|/, '\|')
         time = extract_time(event, @timespec)
         yield Event.new(title, @abbrev, link, time, @tags)
@@ -78,27 +79,27 @@ class EventFetcher
   
   # fetch contents of something depending on which attribs are in the spec
   def extract(from, spec)
-    puts "extract from #{from.class} spec #{spec}"
+    puts "extract from #{from.class} spec #{spec}" if @debug
     begin
       item = from
-      puts "initial item #{item.class}"
+      puts "initial item #{item.class}" if @debug
       if spec["css"]
         item = item.css(spec["css"])
-        puts "after css #{item.inspect}"
+        puts "after css #{item.inspect}" if @debug
       end
       if spec["attr"]
         item = item.attribute(spec["attr"])
-        puts "after attr #{item.inspect}"
+        puts "after attr #{item.inspect}" if @debug
       end
       ensure_array(spec["methods"]).each do |method|
         item = item.send(method)
-        puts "after method #{method} #{item.inspect}"
+        puts "after method #{method} #{item.inspect}" if @debug
       end
       ensure_array(spec["remove"]).each do |remove|
         item.gsub!(/#{remove}/m, "")
-        puts "after remove #{remove.inspect} #{item.inspect}"
+        puts "after remove #{remove.inspect} #{item.inspect}" if @debug
       end
-      puts "final item #{item.inspect}"
+      puts "final item #{item.inspect}" if @debug
       item
     # rescue NoMethodError
     #   "unknown"
@@ -125,12 +126,29 @@ class EventFetcher
   end
 end
 
+options = {}
+OptionParser.new do |parser|
+  parser.banner = "Usage: #{$0} [options]"
+
+  parser.on("-d", "--[no-]debug", "Show debug messages and read from debug URLs") do |v|
+    options[:debug] = v
+  end
+end.parse!
+
 config = YAML.load(File.read("event-list-config.yaml"))
 events = []
 config["sources"].each do |source|
-  fetcher = EventFetcher.new(source)
-  fetcher.each do |event|
-    events << event
+  begin
+    fetcher = EventFetcher.new(source, options[:debug])
+    fetcher.each do |event|
+      events << event
+    end
+  rescue Exception => e
+    if options[:debug]
+      raise
+    else
+      STDERR.puts "error loading #{source}: #{e.message}"
+    end
   end
 end
 

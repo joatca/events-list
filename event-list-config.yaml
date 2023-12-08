@@ -9,7 +9,7 @@ output_file: ../events-list-site/content/_index.md
 abbrev_file: ../events-list-site/content/about/_index.md
 sources:
   - name: Covent Garden Market
-    abbrev: Cov
+    abbrev: CGM
     tags:
       - Municipal
       - Downtown
@@ -70,7 +70,7 @@ sources:
         css: "span.event-time"
         methods: "text"
   - name: Museum London
-    abbrev: Mus
+    abbrev: Museum
     tags:
       - Downtown
       - Culture
@@ -125,7 +125,7 @@ sources:
           - "Doors:"
           - "/\\s*Show:.*$"
   - name: Budweiser Gardens
-    abbrev: Bud
+    abbrev: BudG
     tags:
       - Downtown
     url: https://www.budweisergardens.com/events

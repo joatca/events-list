@@ -188,10 +188,6 @@ HEADER
            end
     out.puts "| #{date} | #{time} | [#{e.title}](#{e.link}) ([#{e.abbrev}](/about##{e.abbrev})) |"
   end
-  out.puts <<FOOTER
-
-_Last updated #{now}_
-FOOTER
 end
 
 File.open(config["abbrev_file"], "w") do |out|

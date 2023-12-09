@@ -216,3 +216,26 @@ sources:
       time:
         css: div.detailColLeft
         methods: text
+  - name: Grand Theatre
+    abbrev: Grand
+    tags:
+      - Downtown
+      - Culture
+    url: https://www.grandtheatre.com/events
+    debug_url: grand.html
+    home: https://www.grandtheatre.com/
+    finders:
+      main:
+        css: div.shows
+      events:
+        css: article
+      link:
+        css: a
+        attr: href
+        methods: value
+      title:
+        css: div.cont span
+        methods: text
+      date:
+        css: div.field-date
+        methods: text

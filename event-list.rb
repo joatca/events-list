@@ -17,11 +17,11 @@ require 'yaml'
 require 'nokogiri'
 require 'chronic'
 
-Event = Struct.new('Event', :title, :abbrev, :link, :time, :tags)
+Event = Struct.new('Event', :title, :abbrev, :link, :time_from, :time_to, :tags)
 
 class EventFetcher
-  def initialize(src, debug = false)
-    @src, @debug = src, debug
+  def initialize(src, today, debug = false)
+    @src, @today, @debug = src, today, debug
     @name, @abbrev, @tags, @url = [
       "name", "abbrev", "tags", @debug ? "debug_url" : "url"
     ].map { |k| @src[k] }
@@ -51,7 +51,16 @@ class EventFetcher
           link = @debug ? raw_link : URI::join(@url, raw_link)
           title = extract(event, @title).gsub(/\|/, '\|')
           time = extract_time(event, @timespec, date)
-          yield Event.new(title, @abbrev, link, time, @tags)
+          puts "event_fetcher each: time is #{time.inspect}" if @debug
+          if time.length == 1
+            puts "event_fetcher container each single: time was #{time.inspect}" if @debug
+            yield Event.new(title, @abbrev, link, time.first, time.first, @tags)
+          else
+            first, last = time[0], time[1]
+            first = today.to_time if first.to_date < @today
+            puts "event_fetcher container each multiple: time was #{time.inspect} first #{first.inspect} last #{last.inspect}" if @debug
+            yield Event.new(title, @abbrev, link, first, last, @tags)
+          end
         end
       end
     else
@@ -61,7 +70,15 @@ class EventFetcher
         link = @debug ? raw_link : URI::join(@url, raw_link)
         title = extract(event, @title).gsub(/\|/, '\|')
         time = extract_time(event, @timespec)
-        yield Event.new(title, @abbrev, link, time, @tags)
+        if time.length == 1
+          puts "event_fetcher normal each single: time was #{time.inspect}" if @debug
+          yield Event.new(title, @abbrev, link, time.first, time.first, @tags)
+        else
+          first, last = time[0], time[1]
+          first = @today.to_time if first.to_date < @today
+          puts "event_fetcher normal each multiple: time was #{time.inspect} first #{first.inspect} last #{last.inspect}" if @debug
+          yield Event.new(title, @abbrev, link, first, last, @tags)
+        end
       end
     end
   end
@@ -114,16 +131,19 @@ class EventFetcher
       timetext += extract(from, spec["date"])
       if spec["time"]
         timetext += " " + extract(from, spec["time"])
-      else
-        timetext += " 00:00:00"
       end
     elsif spec["datetime"]
       timetext += extract(from, spec["datetime"])
     else
       raise "bad date and time spec #{spec.inspect}"
     end
-    time = Chronic.parse(timetext)
-    raise "Time parse of #{timetext} failed" if time.nil?
+    timetext.gsub!(/\s{2,}/m, ' ')
+    puts "extract_time: found timetext #{timetext}" if @debug
+    time = timetext.split(/\s*-\s*/m)
+    puts "extract_time: text time after split #{time.inspect}"
+    time.map! { |t| spec["time"] || spec["datetime"] ? t : t + " 00:00:00" }.map! { |t| Chronic.parse(t) }
+    puts "extract_time: time after split #{time.inspect} length #{time.length}" if @debug
+    raise "time parse of #{timetext} failed" if time.length == 0
     time
   end
 end
@@ -139,10 +159,13 @@ end.parse!
 
 config = YAML.load(File.read("event-list-config.yaml"))
 events = []
+now = Time.now
+today = now.to_date
+
 config["sources"].each do |source|
   next unless source["url"]
   begin
-    fetcher = EventFetcher.new(source, options[:debug])
+    fetcher = EventFetcher.new(source, today, options[:debug])
     fetcher.each do |event|
       events << event
     end
@@ -155,7 +178,6 @@ config["sources"].each do |source|
   end
 end
 
-now = Time.now
 earliest = now - 86400 # yesterday
 latest = earliest + 86400 * 180 # 6 months
 File.open(config["output_file"], "w") do |out|
@@ -170,24 +192,24 @@ draft: false
 |------:|-:|:--------------|
 HEADER
   cur_date = nil
-  events.select { |e| e.time >= earliest && e.time < latest }.sort { |a, b| a.time <=> b.time }.each do |e|
-    days_until = e.time.to_date - now.to_date
+  events.select { |e| e.time_from >= earliest && e.time_from < latest }.sort { |a, b| a.time_from <=> b.time_from }.each do |e|
+    days_until = e.time_from.to_date - today
     date = if days_until < 7
-             e.time.strftime("%A")
-           elsif e.time.year == now.year
-             e.time.strftime("%A %B %d")
+             e.time_from.strftime("%A")
+           elsif e.time_from.year == now.year
+             e.time_from.strftime("%A %B %d")
            else
-             e.time.strftime("%A %B %d %Y")
+             e.time_from.strftime("%A %B %d %Y")
            end
     if date != cur_date
       cur_date = date
     else
       date = ""
     end
-    time = if e.time.hour == 0 && e.time.min == 0
+    time = if e.time_from.hour == 0 && e.time_from.min == 0
              ""
            else
-             e.time.strftime("%H:%M")
+             e.time_from.strftime("%H:%M")
            end
     out.puts "| #{date} | #{time} | [#{e.title}](#{e.link}) ([#{e.abbrev}](/about##{e.abbrev})) |"
   end

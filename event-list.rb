@@ -140,7 +140,7 @@ class EventFetcher
     timetext.gsub!(/\s{2,}/m, ' ')
     puts "extract_time: found timetext #{timetext}" if @debug
     time = timetext.split(/\s*-\s*/m)
-    puts "extract_time: text time after split #{time.inspect}"
+    puts "extract_time: text time after split #{time.inspect}" if @debug
     time.map! { |t| spec["time"] || spec["datetime"] ? t : t + " 00:00:00" }.map! { |t| Chronic.parse(t) }
     puts "extract_time: time after split #{time.inspect} length #{time.length}" if @debug
     raise "time parse of #{timetext} failed" if time.length == 0

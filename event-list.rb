@@ -13,9 +13,49 @@
 
 require 'optparse'
 require 'open-uri'
+require 'json'
 require 'yaml'
 require 'nokogiri'
 require 'chronic'
+
+class Config
+  def initialize
+    @options = {
+      "debug" => false,
+      "config_file" => "event-list-config.yaml",
+      "output_file" => "_index.md",
+      "abbrev_file" => "abbrev.md",
+      "json_file" => "data.json",
+    }
+    OptionParser.new do |parser|
+      parser.banner = "Usage: #{$0} [options]"
+      
+      parser.on("-d", "--[no-]debug", "Show debug messages and read from debug URLs") do |v|
+        @options["debug"] = v
+      end
+      parser.on("-c", "--config-file=FILE", "configuration/sources file") do |f|
+        @options["config_file"] = f
+      end
+      parser.on("-o", "--output-file=FILE", "main output file") do |f|
+        @options["output_file"] = f
+      end
+      parser.on("-a", "--abbrev-file=FILE", "abbreviation output file") do |f|
+        @options["abbrev_file"] = f
+      end
+      parser.on("-j", "--json-file=FILE", "JSON data dump") do |f|
+        @options["json_file"] = f
+      end
+    end.parse!
+    cfdata = YAML.load(File.read(@options["config_file"]))
+    @options.merge!(cfdata)
+  end
+
+  def method_missing(name)
+    o = name.to_s
+    raise "unknown option #{name}" unless @options.has_key?(o)
+    @options[o]
+  end
+end
 
 Event = Struct.new('Event', :title, :abbrev, :link, :time_from, :time_to, :tags)
 
@@ -148,29 +188,27 @@ class EventFetcher
   end
 end
 
-options = {}
-OptionParser.new do |parser|
-  parser.banner = "Usage: #{$0} [options]"
-
-  parser.on("-d", "--[no-]debug", "Show debug messages and read from debug URLs") do |v|
-    options[:debug] = v
-  end
-end.parse!
-
-config = YAML.load(File.read("event-list-config.yaml"))
+config = Config.new
 events = []
 now = Time.now
 today = now.to_date
+json_dump = { "sources" => {} }
 
-config["sources"].each do |source|
+config.sources.each do |source|
   next unless source["url"]
+  json_dump["sources"][source["abbrev"]] = {
+    "abbreviation" => source["abbrev"],
+    "name" => source["name"],
+    "home" => source["home"],
+    "events" => [],
+  }
   begin
-    fetcher = EventFetcher.new(source, today, options[:debug])
+    fetcher = EventFetcher.new(source, today, config.debug)
     fetcher.each do |event|
       events << event
     end
   rescue Exception => e
-    if options[:debug]
+    if config.debug
       raise
     else
       STDERR.puts "error loading #{source}: #{e.message}"
@@ -180,7 +218,7 @@ end
 
 earliest = now - 86400 # yesterday
 latest = earliest + 86400 * 180 # 6 months
-File.open(config["output_file"], "w") do |out|
+File.open(config.output_file, "w") do |out|
   out.puts <<HEADER
 ---
 title: "Events"
@@ -212,10 +250,16 @@ HEADER
              e.time_from.strftime("%H:%M")
            end
     out.puts "| #{date} | #{time} | [#{e.title}](#{e.link}) ([#{e.abbrev}](/about##{e.abbrev})) |"
+    json_dump["sources"][e.abbrev]["events"] << {
+      "title" => e.title,
+      "link" => e.link,
+      "source" => e.abbrev,
+      "time" => e.time_from.iso8601,
+    }
   end
 end
 
-File.open(config["abbrev_file"], "w") do |out|
+File.open(config.abbrev_file, "w") do |out|
   out.puts <<HEADER
 ---
 title: "Abbreviations"
@@ -228,11 +272,15 @@ This page currently supports events found on these sites.
 |   |       | |
 |:--------------|:------|:--|
 HEADER
-  config["sources"].sort { |a, b| a["abbrev"] <=> b["abbrev"] }.each do |s|
+  config.sources.sort { |a, b| a["abbrev"] <=> b["abbrev"] }.each do |s|
     out.puts "| **#{s["abbrev"]}** | [#{s["name"]}](#{s["home"]}) | #{s["note"] ? "*"+s["note"]+"*" : ""}"
   end
   out.puts <<FOOTER
 
 _Last updated #{now}_
 FOOTER
+end
+
+File.open(config.json_file, "w") do |json|
+  json.puts json_dump.to_json
 end

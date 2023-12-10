@@ -192,7 +192,10 @@ config = Config.new
 events = []
 now = Time.now
 today = now.to_date
-json_dump = { "sources" => [] }
+json_dump = {
+  "last_updated" => now.iso8601,
+  "sources" => [],
+}
 
 config.sources.each do |source|
   next unless source["url"]

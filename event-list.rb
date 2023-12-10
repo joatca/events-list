@@ -192,11 +192,11 @@ config = Config.new
 events = []
 now = Time.now
 today = now.to_date
-json_dump = { "sources" => {} }
+json_dump = { "sources" => [] }
 
 config.sources.each do |source|
   next unless source["url"]
-  json_dump["sources"][source["abbrev"]] = {
+  json_dump["sources"] << {
     "abbreviation" => source["abbrev"],
     "name" => source["name"],
     "home" => source["home"],
@@ -206,6 +206,12 @@ config.sources.each do |source|
     fetcher = EventFetcher.new(source, today, config.debug)
     fetcher.each do |event|
       events << event
+      json_dump["sources"].last["events"] << {
+      "title" => event.title,
+      "link" => event.link,
+      "source" => event.abbrev,
+      "time" => event.time_from.iso8601,
+    }
     end
   rescue Exception => e
     if config.debug
@@ -250,12 +256,6 @@ HEADER
              e.time_from.strftime("%H:%M")
            end
     out.puts "| #{date} | #{time} | [#{e.title}](#{e.link}) ([#{e.abbrev}](/about##{e.abbrev})) |"
-    json_dump["sources"][e.abbrev]["events"] << {
-      "title" => e.title,
-      "link" => e.link,
-      "source" => e.abbrev,
-      "time" => e.time_from.iso8601,
-    }
   end
 end
 

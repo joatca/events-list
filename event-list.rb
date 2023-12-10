@@ -260,6 +260,7 @@ HEADER
            end
     out.puts "| #{date} | #{time} | [#{e.title}](#{e.link}) ([#{e.abbrev}](/about##{e.abbrev})) |"
   end
+  out.puts "\nA machine-readable version of this page is available [here](/data.json)"
 end
 
 File.open(config.abbrev_file, "w") do |out|

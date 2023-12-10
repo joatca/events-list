@@ -1,4 +1,6 @@
 *~
 *.html
+*.md
+*.json
 vendor/
 out/

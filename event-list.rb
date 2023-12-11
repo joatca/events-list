@@ -225,7 +225,7 @@ config.sources.each do |source|
   end
 end
 
-earliest = now - 86400 # yesterday
+earliest = today.to_time # midnight this morning
 latest = earliest + 86400 * 180 # 6 months
 File.open(config.output_file, "w") do |out|
   out.puts <<HEADER

@@ -205,9 +205,11 @@ config.sources.each do |source|
     "home" => source["home"],
     "events" => [],
   }
+  fetch_count = 0
   begin
     fetcher = EventFetcher.new(source, today, config.debug)
     fetcher.each do |event|
+      fetch_count += 1
       events << event
       json_dump["sources"].last["events"] << {
       "title" => event.title,
@@ -223,6 +225,7 @@ config.sources.each do |source|
       STDERR.puts "error loading #{source}: #{e.message}"
     end
   end
+  source["note"] = fetch_count == 0 ? "Error: unable to fetch any events" : "#{fetch_count} events found"
 end
 
 earliest = today.to_time # midnight this morning

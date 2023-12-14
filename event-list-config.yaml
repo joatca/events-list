@@ -80,6 +80,7 @@ sources:
     tags:
       - Downtown
       - Culture
+      - Education
     url: https://museumlondon.ca/programs-events
     debug_url: ml.html
     home: https://museumlondon.ca/
@@ -237,3 +238,29 @@ sources:
       date:
         css: div.field-date
         methods: text
+  - name: "London Children's Museum"
+    abbrev: CMus
+    tags:
+      - Downtown
+      - Education
+    url: https://www.londonchildrensmuseum.ca/events
+    debug_url: lcm.html
+    home: https://www.londonchildrensmuseum.ca/
+    finders:
+      main:
+        css: div.views-view-grid
+      events:
+        css: div.views-col
+      link:
+        css: div.views-field-title a
+        attr: href
+        methods: value
+        remove: "\\n"
+      title:
+        css: div.views-field-title a
+        methods: text
+        remove: "\\n"
+      datetime:
+        css: div.views-field-field-date
+        methods: text
+        remove: "\\n"

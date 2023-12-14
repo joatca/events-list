@@ -179,12 +179,28 @@ class EventFetcher
     end
     timetext.gsub!(/\s{2,}/m, ' ')
     puts "extract_time: found timetext #{timetext}" if @debug
-    time = timetext.split(/\s*-\s*/m)
-    puts "extract_time: text time after split #{time.inspect}" if @debug
-    time.map! { |t| spec["time"] || spec["datetime"] ? t : t + " 00:00:00" }.map! { |t| Chronic.parse(t) }
-    puts "extract_time: time after split #{time.inspect} length #{time.length}" if @debug
-    raise "time parse of #{timetext} failed" if time.length == 0
-    time
+    timetextary = timetext.split(/\s*-\s*/m)
+    raise "too many time components #{timetextary.inspect}" unless timetextary.length <= 2
+    puts "extract_time: text time after split #{timetextary.inspect}" if @debug
+    time = [ Chronic.parse(spec["time"] || spec["datetime"] ? timetextary[0] : timetextary[0] + " 00:00:00") ]
+    if timetextary.length > 1
+      time.push(Chronic.parse(
+                  if spec["time"] || spec["datetime"]
+                    if timetextary[1] =~ /^\d{1,2}:/ # assume it's a time only
+                      time[0].to_date.to_s + " " + timetextary[1]
+                    else
+                      timetextary[1]
+                    end
+                  else # just date
+                    timetextary[1] + " 00:00:00"
+                  end
+                )
+               )
+    end
+    timetextary.map! { |t| spec["time"] || spec["datetime"] ? t : t + " 00:00:00" }.map! { |t| Chronic.parse(t) }
+    puts "extract_time: time after split #{timetextary.inspect} length #{timetextary.length}" if @debug
+    raise "time parse of #{timetext} failed" if timetextary.length == 0
+    timetextary
   end
 end
 

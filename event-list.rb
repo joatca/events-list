@@ -47,7 +47,7 @@ class Config
         @options["json_file"] = f
       end
       parser.on("--only=ABBREV", "only process this source") do |o|
-        @options["only"] = o
+        @options["only"] = o.downcase
       end
     end.parse!
     cfdata = YAML.load(File.read(@options["config_file"]))
@@ -219,7 +219,7 @@ json_dump = {
 
 config.sources.each do |source|
   next unless source["url"]
-  next unless config.only.nil? || (config.only == source["abbrev"])
+  next unless config.only.nil? || (config.only == source["abbrev"].downcase)
   json_dump["sources"] << {
     "abbreviation" => source["abbrev"],
     "name" => source["name"],

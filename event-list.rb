@@ -102,7 +102,7 @@ class EventFetcher
           else
             first, last = time[0], time[1]
             puts "event_fetcher container each multiple: time was #{time.inspect} first #{first.inspect} last #{last.inspect}" if @debug
-            first = today.to_time if first.to_date < @today && last.to_date >= @today
+            first = @today.to_time if first.to_date < @today && last.to_date >= @today
             puts "event_fetcher container each multiple: time was #{time.inspect} corrected first #{first.inspect} last #{last.inspect}" if @debug
             yield Event.new(title, @abbrev, link, first, last, @tags)
           end
@@ -120,9 +120,9 @@ class EventFetcher
           yield Event.new(title, @abbrev, link, time.first, time.first, @tags)
         else
           first, last = time[0], time[1]
-            puts "event_fetcher container each multiple: time was #{time.inspect} first #{first.inspect} last #{last.inspect}" if @debug
-            first = today.to_time if first.to_date < @today && last.to_date >= @today
-            puts "event_fetcher container each multiple: time was #{time.inspect} corrected first #{first.inspect} last #{last.inspect}" if @debug
+          puts "event_fetcher container each multiple: time was #{time.inspect} first #{first.inspect} last #{last.inspect}" if @debug
+          first = @today.to_time if first.to_date < @today && last.to_date >= @today
+          puts "event_fetcher container each multiple: time was #{time.inspect} corrected first #{first.inspect} last #{last.inspect}" if @debug
           yield Event.new(title, @abbrev, link, first, last, @tags)
         end
       end

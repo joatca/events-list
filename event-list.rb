@@ -270,9 +270,9 @@ HEADER
     date = if days_until < 7
              e.time_from.strftime("%A")
            elsif e.time_from.year == now.year
-             e.time_from.strftime("%A %B %d")
+             e.time_from.strftime("%a %b %d")
            else
-             e.time_from.strftime("%A %B %d %Y")
+             e.time_from.strftime("%a %b %d %Y")
            end
     if date != cur_date
       cur_date = date

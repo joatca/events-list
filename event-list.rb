@@ -26,6 +26,7 @@ class Config
       "output_file" => "_index.md",
       "abbrev_file" => "abbrev.md",
       "json_file" => "data.json",
+      "only" => nil,
     }
     OptionParser.new do |parser|
       parser.banner = "Usage: #{$0} [options]"
@@ -44,6 +45,9 @@ class Config
       end
       parser.on("-j", "--json-file=FILE", "JSON data dump") do |f|
         @options["json_file"] = f
+      end
+      parser.on("--only=ABBREV", "only process this source") do |o|
+        @options["only"] = o
       end
     end.parse!
     cfdata = YAML.load(File.read(@options["config_file"]))
@@ -215,6 +219,7 @@ json_dump = {
 
 config.sources.each do |source|
   next unless source["url"]
+  next unless config.only.nil? || (config.only == source["abbrev"])
   json_dump["sources"] << {
     "abbreviation" => source["abbrev"],
     "name" => source["name"],

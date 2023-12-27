@@ -298,7 +298,7 @@ sources:
         remove:
           - "\\n"
           - " - .*"
-  - name: Tourist London
+  - name: Tourism London
     abbrev: Tour
     tags:
       - Community

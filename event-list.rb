@@ -215,9 +215,10 @@ class EventFetcher
     else
       raise "bad date and time spec #{spec.inspect}"
     end
+    range_sep = spec["range-sep"] || "-"
     timetext.gsub!(/\s{2,}/m, ' ')
     puts "extract_time: found timetext #{timetext}" if @debug
-    timetextary = timetext.split(/\s*-\s*/m)
+    timetextary = timetext.split(/\s*#{range_sep}\s*/m)
     raise "too many time components #{timetextary.inspect}" unless timetextary.length <= 2
     puts "extract_time: text time after split #{timetextary.inspect}" if @debug
     time = [ Chronic.parse(spec["time"] || spec["datetime"] ? timetextary[0] : timetextary[0] + " 00:00:00") ]

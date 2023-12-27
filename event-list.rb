@@ -284,7 +284,7 @@ HEADER
            else
              e.time_from.strftime("%H:%M")
            end
-    out.puts "| #{date} | #{time} | [#{e.title}](#{e.link}) ([#{e.abbrev}](/about##{e.abbrev})) |"
+    out.puts "| #{date} | #{time} | [#{e.title}](#{e.link}) [(#{e.abbrev})](/about##{e.abbrev}) |"
   end
   out.puts "\nA machine-readable version of this page is available [here](/data.json)"
 end

@@ -321,3 +321,18 @@ sources:
         methods: text
         remove:
           - "^(Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday),\\s+"
+      filters: # exclude events that are already available from another source
+        - match:
+            css: div.description p.location
+            methods: text
+          rules:
+            - exclude: "London Children's Museum"
+            - exclude: "London Knights"
+            - exclude: "London Music Hall"
+            - exclude: "Eldon House"
+            - exclude: "Aeolian Hall"
+            - exclude: "Covent Garden Market"
+            - exclude: "Don Wright Faculty"
+            - exclude: "Museum London"
+            #- exclude: "Wolf Performance"
+            - exclude: "Museum London"

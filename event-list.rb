@@ -63,6 +63,31 @@ end
 
 Event = Struct.new('Event', :title, :abbrev, :link, :time_from, :time_to, :tags)
 
+class Filter
+  attr_reader :matcher
+  
+  def initialize(h)
+    raise "need matcher" unless h.has_key?("match")
+    @matcher = h["match"]
+    raise "need rules" unless h["rules"].is_a?(Array)
+    @rules = h["rules"]
+  end
+
+  # return true if we should filter out this event
+  def filtered(data)
+    @rules.each do |rule|
+      if rule.has_key?("exclude")
+        return true if data =~ /#{rule["exclude"]}/
+      elsif rule.has_key?("include")
+        return true unless data =~ /#{rule["include"]}/
+      else
+        raise "bad rule set #{@rules.inspect}"
+      end
+    end
+    return false
+  end
+end
+
 class EventFetcher
   def initialize(src, today, debug = false)
     @src, @today, @debug = src, today, debug
@@ -72,6 +97,7 @@ class EventFetcher
     @main, @date_containers, @events, @link, @title = [
       "main", "date_containers", "events", "link", "title"
     ].map { |k| @src["finders"][k] }
+    @filters = (@src["finders"]["filters"] || []).map { |h| Filter.new(h) }
     @timespec = [
       "date", "time", "datetime"
     ].map { |k| [k, @src["finders"][k]] }.to_h
@@ -90,6 +116,9 @@ class EventFetcher
         date = extract(container, @timespec["date"])
         puts "found date #{date} for container" if @debug
         extract(container, @events).each do |event|
+          next if @filters.any? { |filter|
+            filter.filtered(extract(event, filter.matcher))
+          }
           puts "found event #{event.class}" if @debug
           raw_link = extract(event, @link)
           link = @debug ? raw_link : URI::join(@url, raw_link)
@@ -111,6 +140,9 @@ class EventFetcher
     else
       extract(main, @events).each do |event|
         puts "found event" if @debug
+        next if @filters.any? { |filter|
+          filter.filtered(extract(event, filter.matcher))
+        }
         raw_link = extract(event, @link)
         link = @debug ? raw_link : URI::join(@url, raw_link)
         title = extract(event, @title).gsub(/\|/, '\|')

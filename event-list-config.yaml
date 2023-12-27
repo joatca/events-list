@@ -264,3 +264,37 @@ sources:
         css: div.views-field-field-date
         methods: text
         remove: "\\n"
+  - name: Information London
+    abbrev: Info
+    tags:
+      - Downtown
+      - Community
+    url: https://www.informationlondon.ca/Event/List
+    debug_url: il.html
+    home: https://www.informationlondon.ca/
+    finders:
+      main:
+        css: table.tablesorter tbody
+      events:
+        css: a.event-div
+      link:
+        attr: href
+        methods: value
+      title:
+        css: div.event-info li.event-title
+        methods: text
+        remove: "\\n"
+        remove: "^\\s+"
+      date:
+        css: div.date-of-event
+        methods: text
+        remove:
+          - "\\r"
+          - "\\n"
+          - "\\s*\\S+\\s*$"
+      time:
+        css: ul.event-details
+        methods: text
+        remove:
+          - "\\n"
+          - " - .*"

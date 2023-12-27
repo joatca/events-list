@@ -298,3 +298,26 @@ sources:
         remove:
           - "\\n"
           - " - .*"
+  - name: Tourist London
+    abbrev: Tour
+    tags:
+      - Community
+    url: https://www.londontourism.ca/events/all-events
+    debug_url: tour.html
+    home: https://www.londontourism.ca/
+    finders:
+      main:
+        css: ul.eventCarousel
+      events:
+        css: li.before-slide a
+      link:
+        attr: href
+        methods: value
+      title:
+        css: div.description h3
+        methods: text
+      date:
+        css: div.description time
+        methods: text
+        remove:
+          - "^(Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday),\\s+"

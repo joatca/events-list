@@ -37,12 +37,12 @@ sources:
         css: "div.event-date-time strong"
         methods: "text"
         # removes the trailing end date
-        remove: "-.*$"
+        replace: "-.*$"
       time:
         css: "div.event-date-time div"
         methods: "text"
         # removes the trailed end time
-        remove: "-.*$"
+        replace: "-.*$"
   - name: Aeolian Hall
     abbrev: Aeol
     tags:
@@ -64,14 +64,14 @@ sources:
         css: "div.event-title"
         methods: "text"
         # strips leading and trailing whitespace
-        remove:
+        replace:
           - "^\\s+"
           - "\\s+$"
       date:
         css: "span.event-date"
         methods: "text"
         # removes the leading day of the week
-        remove: "^\\S+ "
+        replace: "^\\S+ "
       time:
         css: "span.event-time"
         methods: "text"
@@ -100,7 +100,7 @@ sources:
         css: span.event-date
         methods: text
         # remove leading day of the week
-        remove: "^\\S+ "
+        replace: "^\\S+ "
   - name: London Music Hall
     abbrev: LMH
     tags:
@@ -128,7 +128,7 @@ sources:
         css: div.event-info div.times
         methods: text
         # remove extraneous crap
-        remove:
+        replace:
           - "Doors:"
           - "/\\s*Show:.*$"
   - name: Budweiser Gardens
@@ -154,7 +154,7 @@ sources:
         css: div.m-eventItem__date
         methods: text
         # remove last word (day of week)
-        remove: "\\S+\\s*$"
+        replace: "\\S+\\s*$"
   - name: Wolf Performance Hall
     abbrev: Wolf
     tags:
@@ -185,7 +185,7 @@ sources:
           - pop
           - text
         # remove end time
-        remove: "- \\s*.*"
+        replace: "- \\s*.*"
   - name: Don Wright Faculty of Music
     abbrev: FMus
     tags:
@@ -202,7 +202,7 @@ sources:
         css: h2
         methods: text
         # remove leading day of week
-        remove: "^\\S+\\s+"
+        replace: "^\\S+\\s+"
       events:
         css: div.detailColFull
       link:
@@ -255,15 +255,15 @@ sources:
         css: div.views-field-title a
         attr: href
         methods: value
-        remove: "\\n"
+        replace: "\\n"
       title:
         css: div.views-field-title a
         methods: text
-        remove: "\\n"
+        replace: "\\n"
       datetime:
         css: div.views-field-field-date
         methods: text
-        remove: "\\n"
+        replace: "\\n"
   - name: Information London
     abbrev: Info
     tags:
@@ -283,19 +283,19 @@ sources:
       title:
         css: div.event-info li.event-title
         methods: text
-        remove: "\\n"
-        remove: "^\\s+"
+        replace: "\\n"
+        replace: "^\\s+"
       date:
         css: div.date-of-event
         methods: text
-        remove:
+        replace:
           - "\\r"
           - "\\n"
           - "\\s*\\S+\\s*$"
       time:
         css: ul.event-details
         methods: text
-        remove:
+        replace:
           - "\\n"
           - " - .*"
   - name: Tourism London
@@ -319,8 +319,9 @@ sources:
       date:
         css: div.description time
         methods: text
-        remove:
+        replace:
           - "^(Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday),\\s+"
+          - ["(\\w+)\\s+(\\d+)\\s+-\\s+(\\d+)", "\\1 \\2 - \\1 \\3"]
       filters: # exclude events that are already available from another source
         - match:
             css: div.description p.location
@@ -359,7 +360,7 @@ sources:
       date:
         css: div.elementor-element-c029367
         methods: text
-        remove:
+        replace:
           - "^[\\r\\n\\t]*"
           - "(Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday),\\s+"
           - "[\\r\\n\\t].*$"

@@ -196,9 +196,11 @@ class EventFetcher
         item = item.send(method)
         puts "after method #{method} #{item.inspect}" if @debug
       end
-      ensure_array(spec["remove"]).each do |remove|
-        item.gsub!(/#{remove}/m, "")
-        puts "after remove #{remove.inspect} #{item.inspect}" if @debug
+      ensure_array(spec["replace"]).each do |replace|
+        rep = replace.is_a?(Array) ? replace : [ replace,  ""]
+        puts "replace #{replace.inspect} becomes #{rep.inspect}"
+        item.gsub!(/#{rep.first}/m, rep.last)
+        puts "after replace #{replace.inspect} #{item.inspect}" if @debug
       end
       puts "final item #{item.inspect}" if @debug
       item
@@ -345,7 +347,7 @@ This page currently supports events found on these sites.
 |:--------------|:------|:--|
 HEADER
   config.sources.sort { |a, b| a["abbrev"] <=> b["abbrev"] }.each do |s|
-    out.puts "| **#{s["abbrev"]}** | [#{s["name"]}](#{s["home"]}) | #{s["note"] ? "*"+s["note"]+"*" : ""}"
+    out.puts "| **#{s["abbrev"]}** | [#{s["name"]}](#{s["home"] || s["url"]}) | #{s["note"] ? "*"+s["note"]+"*" : ""}"
   end
   out.puts <<FOOTER
 

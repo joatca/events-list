@@ -221,7 +221,7 @@ class EventFetcher
     else
       raise "bad date and time spec #{spec.inspect}"
     end
-    puts "extract_time: spec is #{spec.inspect}"
+    puts "extract_time: spec is #{spec.inspect}" if @debug
     range_sep = spec["range-sep"] || "-"
     timetext.gsub!(/\s{2,}/m, ' ')
     puts "extract_time: found timetext #{timetext}" if @debug

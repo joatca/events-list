@@ -341,13 +341,13 @@ date: #{ now.iso8601 }
 draft: false
 ---
 
-This page currently supports events found on these sites.
+This page knowsn about events on these sites.
 
 |   |       | |
 |:--------------|:------|:--|
 HEADER
   config.sources.sort { |a, b| a["abbrev"] <=> b["abbrev"] }.each do |s|
-    out.puts "| **#{s["abbrev"]}** | [#{s["name"]}](#{s["home"] || s["url"]}) | #{s["note"] ? "*"+s["note"]+"*" : ""}"
+    out.puts "| **#{s["abbrev"]}** | [#{s["name"]}](#{s.has_key?("home") ? s["home"] : s["url"]}) | #{s["note"] ? "*"+s["note"]+"*" : ""}"
   end
   out.puts <<FOOTER
 

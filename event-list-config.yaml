@@ -21,7 +21,6 @@ sources:
       - Downtown
     url: https://coventmarket.com/events/
     debug_url: "cgm.html"
-    home: https://coventmarket.com/
     finders:
       main:
         css: "section.tile-callout-cards"
@@ -50,7 +49,6 @@ sources:
       - Culture
     url: https://aeolianhall.ca/events/
     debug_url: "ah.html"
-    home: https://aeolianhall.ca/
     finders:
       main:
         css: "section.events-feed"
@@ -83,7 +81,6 @@ sources:
       - Education
     url: https://museumlondon.ca/programs-events
     debug_url: ml.html
-    home: https://museumlondon.ca/
     finders:
       main:
         css: div.event
@@ -108,7 +105,6 @@ sources:
       - Culture
     url: http://londonmusichall.com/upcoming-events/
     debug_url: lmh.html
-    home: http://londonmusichall.com/
     finders:
       main:
         css: div.events
@@ -137,7 +133,6 @@ sources:
       - Downtown
     url: https://www.budweisergardens.com/events
     debug_url: bg.html
-    home: https://www.budweisergardens.com/
     finders:
       main:
         css: div.m-eventList
@@ -162,7 +157,6 @@ sources:
       - Culture
     url: https://www.lpl.ca/services-spaces/featured-spaces/wolf-performance-hall
     debug_url: wph.html
-    home: https://www.lpl.ca/services-spaces/featured-spaces/wolf-performance-hall
     finders:
       main:
         css: div.views-view-grid
@@ -192,7 +186,6 @@ sources:
       - Culture
     url: http://www.events.westernu.ca/events/music/
     debug_url: dwfm.html
-    home: http://www.events.westernu.ca/events/music/
     finders:
       main:
         css: "div#mainCol"
@@ -222,7 +215,6 @@ sources:
       - Culture
     url: https://www.grandtheatre.com/events
     debug_url: grand.html
-    home: https://www.grandtheatre.com/
     finders:
       main:
         css: div.shows
@@ -245,7 +237,6 @@ sources:
       - Education
     url: https://www.londonchildrensmuseum.ca/events
     debug_url: lcm.html
-    home: https://www.londonchildrensmuseum.ca/
     finders:
       main:
         css: div.views-view-grid
@@ -271,7 +262,6 @@ sources:
       - Community
     url: https://www.informationlondon.ca/Event/List
     debug_url: il.html
-    home: https://www.informationlondon.ca/
     finders:
       main:
         css: table.tablesorter tbody
@@ -304,7 +294,6 @@ sources:
       - Community
     url: https://www.londontourism.ca/events/all-events
     debug_url: tour.html
-    home: https://www.londontourism.ca/
     finders:
       main:
         css: ul.eventCarousel
@@ -344,7 +333,6 @@ sources:
       - Downtown
     url: https://eldonhouse.ca/events/
     debug_url: eldon.html
-    home: https://eldonhouse.ca/
     finders:
       main:
         css: div.elementor-posts-container

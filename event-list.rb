@@ -99,7 +99,7 @@ class EventFetcher
     ].map { |k| @src["finders"][k] }
     @filters = (@src["finders"]["filters"] || []).map { |h| Filter.new(h) }
     @timespec = [
-      "date", "time", "datetime"
+      "date", "time", "datetime", "range-sep"
     ].map { |k| [k, @src["finders"][k]] }.to_h
   end
 
@@ -138,14 +138,20 @@ class EventFetcher
         end
       end
     else
+      i = 0
       extract(main, @events).each do |event|
+        i += 1
         puts "found event" if @debug
         next if @filters.any? { |filter|
           filter.filtered(extract(event, filter.matcher))
         }
+        puts "each #{i}: finding link" if @debug
         raw_link = extract(event, @link)
         link = @debug ? raw_link : URI::join(@url, raw_link)
+        puts "each #{i}: found link #{link.inspect}" if @debug
+        puts "each #{i}: finding title" if @debug
         title = extract(event, @title).gsub(/\|/, '\|')
+        puts "each #{i}: found title #{title.inspect}" if @debug
         time = extract_time(event, @timespec)
         if time.length == 1
           puts "event_fetcher normal each single: time was #{time.inspect}" if @debug
@@ -215,10 +221,13 @@ class EventFetcher
     else
       raise "bad date and time spec #{spec.inspect}"
     end
+    puts "extract_time: spec is #{spec.inspect}"
     range_sep = spec["range-sep"] || "-"
     timetext.gsub!(/\s{2,}/m, ' ')
     puts "extract_time: found timetext #{timetext}" if @debug
-    timetextary = timetext.split(/\s*#{range_sep}\s*/m)
+    split = /\s*#{range_sep}\s*/m
+    puts "extract_time: about to split timetext with #{split.inspect}" if @debug
+    timetextary = timetext.split(split)
     raise "too many time components #{timetextary.inspect}" unless timetextary.length <= 2
     puts "extract_time: text time after split #{timetextary.inspect}" if @debug
     time = [ Chronic.parse(spec["time"] || spec["datetime"] ? timetextary[0] : timetextary[0] + " 00:00:00") ]

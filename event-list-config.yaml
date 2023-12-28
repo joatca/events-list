@@ -336,3 +336,33 @@ sources:
             - exclude: "Museum London"
             #- exclude: "Wolf Performance"
             - exclude: "Museum London"
+  - name: Eldon House
+    abbrev: Eldon
+    tags:
+      - Community
+      - Downtown
+    url: https://eldonhouse.ca/events/
+    debug_url: eldon.html
+    home: https://eldonhouse.ca/
+    finders:
+      main:
+        css: div.elementor-posts-container
+      events:
+        css: div.elementor-element-58e298a
+      link:
+        css: div.elementor-button-wrapper a.elementor-button
+        attr: href
+        methods: value
+      title:
+        css: div.elementor-element-ad95776 h3.elementor-heading-title
+        methods: text
+      date:
+        css: div.elementor-element-c029367
+        methods: text
+        remove:
+          - "^[\\r\\n\\t]*"
+          - "(Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday),\\s+"
+          - "[\\r\\n\\t].*$"
+          - ",\\s*\\d{1,2}:.*$"
+          - ",\\s*Drop in.*"
+      range-sep: " (?:to|and) "

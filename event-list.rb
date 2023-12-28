@@ -198,7 +198,7 @@ class EventFetcher
       end
       ensure_array(spec["replace"]).each do |replace|
         rep = replace.is_a?(Array) ? replace : [ replace,  ""]
-        puts "replace #{replace.inspect} becomes #{rep.inspect}"
+        puts "replace #{replace.inspect} becomes #{rep.inspect}" if @debug
         item.gsub!(/#{rep.first}/m, rep.last)
         puts "after replace #{replace.inspect} #{item.inspect}" if @debug
       end

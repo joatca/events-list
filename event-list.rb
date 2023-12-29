@@ -11,6 +11,7 @@
 # You should have received a copy of the GNU General Public License along with this program. If not, see
 # <https://www.gnu.org/licenses/>.
 
+require 'set'
 require 'optparse'
 require 'open-uri'
 require 'json'
@@ -115,6 +116,7 @@ class EventFetcher
   
   def each(latest_time)
     puts "reading #{@url}" if @debug
+    seen = Set.new
     catch (:done) do
       doc = Nokogiri::HTML(URI.open(@url))
       main = extract(doc, @main).first
@@ -137,6 +139,14 @@ class EventFetcher
             time = extract_time(event, @timespec, date)
             puts "event_fetcher each: time is #{time.inspect}" if @debug
             throw :done if time.first > latest_time
+            hashcode = title.hash ^ time.hash
+            if seen.include?(hashcode)
+              puts "event_fetcher each: hashcode #{hashcode} already found" if @debug
+              throw :done
+            else
+              puts "event_fetcher each: added new hashcode #{hashcode}" if @debug
+              seen << hashcode
+            end
             if time.length == 1
               puts "event_fetcher container each single: time was #{time.inspect}" if @debug
               yield Event.new(title, @abbrev, link, time.first, time.first, @tags)
@@ -166,6 +176,14 @@ class EventFetcher
           puts "each #{i}: found title #{title.inspect}" if @debug
           time = extract_time(event, @timespec)
           throw :done if time.first > latest_time
+          hashcode = title.hash ^ time.hash
+          if seen.include?(hashcode)
+            puts "event_fetcher each: existing hashcode #{hashcode} found" if @debug
+            throw :done
+          else
+            puts "event_fetcher each: added new hashcode #{hashcode}" if @debug
+            seen << hashcode
+          end
           if time.length == 1
             puts "event_fetcher normal each single: time was #{time.inspect}" if @debug
             yield Event.new(title, @abbrev, link, time.first, time.first, @tags)

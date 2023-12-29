@@ -91,9 +91,10 @@ end
 class EventFetcher
   def initialize(src, today, debug = false)
     @src, @today, @debug = src, today, debug
-    @name, @abbrev, @tags, @url = [
-      "name", "abbrev", "tags", @debug ? "debug_url" : "url"
+    @name, @abbrev, @tags, @url, @page_suffix = [
+      "name", "abbrev", "tags", @debug ? "debug_url" : "url", "page_suffix"
     ].map { |k| @src[k] }
+    @first_page = @src.has_key?("first_page") ? @src["first_page"].to_i : 1
     @main, @date_containers, @events, @link, @title = [
       "main", "date_containers", "events", "link", "title"
     ].map { |k| @src["finders"][k] }
@@ -103,30 +104,70 @@ class EventFetcher
     ].map { |k| [k, @src["finders"][k]] }.to_h
   end
 
-  def each
+  def page_url(page)
+    raise "bad page number" if !page.is_a?(Integer) || page < 1
+    if page == 1
+      raise "no pages" if @page_suffix.nil?
+      return @url
+    end
+    "#{@page_suffix}#{page}"
+  end
+  
+  def each(latest_time)
     puts "reading #{@url}" if @debug
-    doc = Nokogiri::HTML(URI.open(@url))
-    main = extract(doc, @main).first
-    if @date_containers
-      # each date has a container with multiple timed events
-      c = extract(main, @date_containers)
-      puts "Found containers #{c.class}" if @debug
-      c.each do |container|
-        puts "found date container #{container.class}" if @debug
-        date = extract(container, @timespec["date"])
-        puts "found date #{date} for container" if @debug
-        extract(container, @events).each do |event|
+    catch (:done) do
+      doc = Nokogiri::HTML(URI.open(@url))
+      main = extract(doc, @main).first
+      if @date_containers
+        # each date has a container with multiple timed events
+        c = extract(main, @date_containers)
+        puts "Found containers #{c.class}" if @debug
+        c.each do |container|
+          puts "found date container #{container.class}" if @debug
+          date = extract(container, @timespec["date"])
+          puts "found date #{date} for container" if @debug
+          extract(container, @events).each do |event|
+            next if @filters.any? { |filter|
+              filter.filtered(extract(event, filter.matcher))
+            }
+            puts "found event #{event.class}" if @debug
+            raw_link = extract(event, @link)
+            link = @debug ? raw_link : URI::join(@url, raw_link)
+            title = extract(event, @title).gsub(/\|/, '\|')
+            time = extract_time(event, @timespec, date)
+            puts "event_fetcher each: time is #{time.inspect}" if @debug
+            throw :done if time.first > latest_time
+            if time.length == 1
+              puts "event_fetcher container each single: time was #{time.inspect}" if @debug
+              yield Event.new(title, @abbrev, link, time.first, time.first, @tags)
+            else
+              first, last = time[0], time[1]
+              puts "event_fetcher container each multiple: time was #{time.inspect} first #{first.inspect} last #{last.inspect}" if @debug
+              first = @today.to_time if first.to_date < @today && last.to_date >= @today
+              puts "event_fetcher container each multiple: time was #{time.inspect} corrected first #{first.inspect} last #{last.inspect}" if @debug
+              yield Event.new(title, @abbrev, link, first, last, @tags)
+            end
+          end
+        end
+      else
+        i = 0
+        extract(main, @events).each do |event|
+          i += 1
+          puts "found event" if @debug
           next if @filters.any? { |filter|
             filter.filtered(extract(event, filter.matcher))
           }
-          puts "found event #{event.class}" if @debug
+          puts "each #{i}: finding link" if @debug
           raw_link = extract(event, @link)
           link = @debug ? raw_link : URI::join(@url, raw_link)
+          puts "each #{i}: found link #{link.inspect}" if @debug
+          puts "each #{i}: finding title" if @debug
           title = extract(event, @title).gsub(/\|/, '\|')
-          time = extract_time(event, @timespec, date)
-          puts "event_fetcher each: time is #{time.inspect}" if @debug
+          puts "each #{i}: found title #{title.inspect}" if @debug
+          time = extract_time(event, @timespec)
+          throw :done if time.first > latest_time
           if time.length == 1
-            puts "event_fetcher container each single: time was #{time.inspect}" if @debug
+            puts "event_fetcher normal each single: time was #{time.inspect}" if @debug
             yield Event.new(title, @abbrev, link, time.first, time.first, @tags)
           else
             first, last = time[0], time[1]
@@ -135,33 +176,6 @@ class EventFetcher
             puts "event_fetcher container each multiple: time was #{time.inspect} corrected first #{first.inspect} last #{last.inspect}" if @debug
             yield Event.new(title, @abbrev, link, first, last, @tags)
           end
-        end
-      end
-    else
-      i = 0
-      extract(main, @events).each do |event|
-        i += 1
-        puts "found event" if @debug
-        next if @filters.any? { |filter|
-          filter.filtered(extract(event, filter.matcher))
-        }
-        puts "each #{i}: finding link" if @debug
-        raw_link = extract(event, @link)
-        link = @debug ? raw_link : URI::join(@url, raw_link)
-        puts "each #{i}: found link #{link.inspect}" if @debug
-        puts "each #{i}: finding title" if @debug
-        title = extract(event, @title).gsub(/\|/, '\|')
-        puts "each #{i}: found title #{title.inspect}" if @debug
-        time = extract_time(event, @timespec)
-        if time.length == 1
-          puts "event_fetcher normal each single: time was #{time.inspect}" if @debug
-          yield Event.new(title, @abbrev, link, time.first, time.first, @tags)
-        else
-          first, last = time[0], time[1]
-          puts "event_fetcher container each multiple: time was #{time.inspect} first #{first.inspect} last #{last.inspect}" if @debug
-          first = @today.to_time if first.to_date < @today && last.to_date >= @today
-          puts "event_fetcher container each multiple: time was #{time.inspect} corrected first #{first.inspect} last #{last.inspect}" if @debug
-          yield Event.new(title, @abbrev, link, first, last, @tags)
         end
       end
     end
@@ -263,6 +277,9 @@ json_dump = {
   "sources" => [],
 }
 
+earliest = today.to_time # midnight this morning
+latest = earliest + 86400 * 90 # 3 months
+
 config.sources.each do |source|
   next unless source["url"]
   next unless config.only.nil? || (config.only == source["abbrev"].downcase)
@@ -275,7 +292,7 @@ config.sources.each do |source|
   fetch_count = 0
   begin
     fetcher = EventFetcher.new(source, today, config.debug)
-    fetcher.each do |event|
+    fetcher.each(latest) do |event|
       fetch_count += 1
       events << event
       json_dump["sources"].last["events"] << {
@@ -295,8 +312,6 @@ config.sources.each do |source|
   source["note"] = fetch_count == 0 ? "Error: unable to fetch any events" : "#{fetch_count} events found"
 end
 
-earliest = today.to_time # midnight this morning
-latest = earliest + 86400 * 180 # 6 months
 File.open(config.output_file, "w") do |out|
   out.puts <<HEADER
 ---
@@ -341,7 +356,7 @@ date: #{ now.iso8601 }
 draft: false
 ---
 
-This page knowsn about events on these sites.
+This page knows about events on these sites.
 
 |   |       | |
 |:--------------|:------|:--|

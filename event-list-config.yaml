@@ -236,6 +236,8 @@ sources:
       - Downtown
       - Education
     url: https://www.londonchildrensmuseum.ca/events
+    page_suffix: ?page=
+    first_page: 0
     debug_url: lcm.html
     finders:
       main:

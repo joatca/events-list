@@ -360,7 +360,6 @@ config.sources.each do |source|
     }
     end
   rescue Exception => e
-    raise
     if config.debug
       raise
     else

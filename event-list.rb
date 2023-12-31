@@ -124,7 +124,7 @@ class EventFetcher
     catch (:done) do
       loop do
         url = page_url(page)
-        puts "reading #{url}" if @debug
+        puts "reading #{url}"
         doc = begin
                 Nokogiri::HTML(URI.open(url))
               rescue Errno::ENOENT
@@ -152,7 +152,11 @@ class EventFetcher
               }
               puts "found event #{event.class}" if @debug
               raw_link = extract(event, @link)
-              link = @debug ? raw_link : URI::join(url, raw_link)
+              link = begin
+                       @debug ? raw_link : URI::join(@url, raw_link)
+                     rescue URI::InvalidURIError
+                       url # replace bad URLs with current events page
+                     end
               title = extract(event, @title).gsub(/\|/, '\|')
               time = extract_time(event, @timespec, date)
               puts "event_fetcher each: time is #{time.inspect}" if @debug
@@ -194,7 +198,11 @@ class EventFetcher
             }
             puts "each #{i}: finding link" if @debug
             raw_link = extract(event, @link)
-            link = @debug ? raw_link : URI::join(@url, raw_link)
+            link = begin
+                     @debug ? raw_link : URI::join(@url, raw_link)
+                   rescue URI::InvalidURIError
+                     url # replace bad URLs with current events page
+                   end
             puts "each #{i}: found link #{link.inspect}" if @debug
             puts "each #{i}: finding title" if @debug
             title = extract(event, @title).gsub(/\|/, '\|')
@@ -352,10 +360,11 @@ config.sources.each do |source|
     }
     end
   rescue Exception => e
+    raise
     if config.debug
       raise
     else
-      STDERR.puts "error loading #{source}: #{e.message}"
+      STDERR.puts "error loading #{source}: #{e.class} #{e.message}"
     end
   end
   source["note"] = fetch_count == 0 ? "Error: unable to fetch any events" : "#{fetch_count} events found"

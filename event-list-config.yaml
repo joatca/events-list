@@ -300,7 +300,10 @@ sources:
     tags:
       - Community
     url: https://www.londontourism.ca/events/all-events
+    page_suffix: /page/
+    max_page: 30
     debug_url: tour.html
+    debug_page_suffix: _page_
     finders:
       main:
         css: ul.eventCarousel

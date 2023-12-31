@@ -242,8 +242,9 @@ sources:
     url: https://www.londonchildrensmuseum.ca/events
     page_suffix: ?page=
     first_page: 0
-    max_page: 8
+    max_page: 10
     debug_url: lcm.html
+    debug_page_suffix: ?page=
     finders:
       main:
         css: div.views-view-grid

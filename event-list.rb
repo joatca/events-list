@@ -117,8 +117,30 @@ class EventFetcher
   def single_page
     @page_suffix.nil?
   end
+
+  def yield_event(latest_time, link, title, time, seen, &block)
+    throw :done if time.first > latest_time
+    hashcode = title.hash ^ time.hash
+    if seen.include?(hashcode)
+      puts "yield_event: hashcode #{hashcode} already found" if @debug
+      throw :done
+    else
+      puts "yield_event: added new hashcode #{hashcode}" if @debug
+      seen << hashcode
+    end
+    if time.length == 1
+      puts "yield_event single: time was #{time.inspect}" if @debug
+      yield Event.new(title, @abbrev, link, time.first, time.first, @tags)
+    else
+      first, last = time[0], time[1]
+      puts "yield_event multiple: time was #{time.inspect} first #{first.inspect} last #{last.inspect}" if @debug
+      first = @today.to_time if first.to_date < @today && last.to_date >= @today
+      puts "yield_event multiple: time was #{time.inspect} corrected first #{first.inspect} last #{last.inspect}" if @debug
+      yield Event.new(title, @abbrev, link, first, last, @tags)
+    end
+  end
   
-  def each(latest_time)
+  def each(latest_time, &block)
     page = @first_page
     seen = Set.new
     catch (:done) do
@@ -159,27 +181,9 @@ class EventFetcher
                      end
               title = extract(event, @title).gsub(/\|/, '\|')
               time = extract_time(event, @timespec, date)
-              puts "event_fetcher each: time is #{time.inspect}" if @debug
+              puts "yield_event: time is #{time.inspect}" if @debug
               page_event_count += 1
-              throw :done if time.first > latest_time
-              hashcode = title.hash ^ time.hash
-              if seen.include?(hashcode)
-                puts "event_fetcher each: hashcode #{hashcode} already found" if @debug
-                throw :done
-              else
-                puts "event_fetcher each: added new hashcode #{hashcode}" if @debug
-                seen << hashcode
-              end
-              if time.length == 1
-                puts "event_fetcher container each single: time was #{time.inspect}" if @debug
-                yield Event.new(title, @abbrev, link, time.first, time.first, @tags)
-              else
-                first, last = time[0], time[1]
-                puts "event_fetcher container each multiple: time was #{time.inspect} first #{first.inspect} last #{last.inspect}" if @debug
-                first = @today.to_time if first.to_date < @today && last.to_date >= @today
-                puts "event_fetcher container each multiple: time was #{time.inspect} corrected first #{first.inspect} last #{last.inspect}" if @debug
-                yield Event.new(title, @abbrev, link, first, last, @tags)
-              end
+              yield_event(latest_time, link, title, time, seen, &block)
             end
           end
         else
@@ -209,25 +213,7 @@ class EventFetcher
             puts "each #{i}: found title #{title.inspect}" if @debug
             time = extract_time(event, @timespec)
             page_event_count += 1
-            throw :done if time.first > latest_time
-            hashcode = title.hash ^ time.hash
-            if seen.include?(hashcode)
-              puts "event_fetcher each: existing hashcode #{hashcode} found" if @debug
-              throw :done
-            else
-              puts "event_fetcher each: added new hashcode #{hashcode}" if @debug
-              seen << hashcode
-            end
-            if time.length == 1
-              puts "event_fetcher normal each single: time was #{time.inspect}" if @debug
-              yield Event.new(title, @abbrev, link, time.first, time.first, @tags)
-            else
-              first, last = time[0], time[1]
-              puts "event_fetcher container each multiple: time was #{time.inspect} first #{first.inspect} last #{last.inspect}" if @debug
-              first = @today.to_time if first.to_date < @today && last.to_date >= @today
-              puts "event_fetcher container each multiple: time was #{time.inspect} corrected first #{first.inspect} last #{last.inspect}" if @debug
-              yield Event.new(title, @abbrev, link, first, last, @tags)
-            end
+            yield_event(latest_time, link, title, time, seen, &block)
           end
         end
         throw :done if single_page # give up now unless we are multi-page

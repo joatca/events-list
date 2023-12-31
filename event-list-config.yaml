@@ -80,7 +80,11 @@ sources:
       - Culture
       - Education
     url: https://museumlondon.ca/programs-events
+    page_suffix: /p
+    first_page: 1
+    max_page: 5
     debug_url: ml.html
+    debug_page_suffix: _p
     finders:
       main:
         css: div.event
@@ -238,6 +242,7 @@ sources:
     url: https://www.londonchildrensmuseum.ca/events
     page_suffix: ?page=
     first_page: 0
+    max_page: 8
     debug_url: lcm.html
     finders:
       main:

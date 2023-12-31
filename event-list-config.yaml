@@ -154,36 +154,36 @@ sources:
         methods: text
         # remove last word (day of week)
         replace: "\\S+\\s*$"
-  - name: Wolf Performance Hall
-    abbrev: Wolf
-    tags:
-      - Downtown
-      - Culture
-    url: https://www.lpl.ca/services-spaces/featured-spaces/wolf-performance-hall
-    debug_url: wph.html
-    finders:
-      main:
-        css: div.views-view-grid
-      events:
-        css: a.teaser-card--event
-      link:
-        attr: href
-        methods: value
-      title:
-        attr: title
-        methods: value
-      date:
-        css: div.teaser-card__event-date div
-        methods:
-          - first
-          - text
-      time:
-        css: div.teaser-card__event-date div
-        methods:
-          - pop
-          - text
-        # remove end time
-        replace: "- \\s*.*"
+  # - name: Wolf Performance Hall
+  #   abbrev: Wolf
+  #   tags:
+  #     - Downtown
+  #     - Culture
+  #   url: https://www.lpl.ca/services-spaces/featured-spaces/wolf-performance-hall
+  #   debug_url: wph.html
+  #   finders:
+  #     main:
+  #       css: div.views-view-grid
+  #     events:
+  #       css: a.teaser-card--event
+  #     link:
+  #       attr: href
+  #       methods: value
+  #     title:
+  #       attr: title
+  #       methods: value
+  #     date:
+  #       css: div.teaser-card__event-date div
+  #       methods:
+  #         - first
+  #         - text
+  #     time:
+  #       css: div.teaser-card__event-date div
+  #       methods:
+  #         - pop
+  #         - text
+  #       # remove end time
+  #       replace: "- \\s*.*"
   - name: Don Wright Faculty of Music
     abbrev: FMus
     tags:

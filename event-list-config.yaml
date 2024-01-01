@@ -366,3 +366,33 @@ sources:
           - ",\\s*\\d{1,2}:.*$"
           - ",\\s*Drop in.*"
       range-sep: " (?:to|and) "
+  - name: Thames Valley District School Board
+    abbrev: TVDSB
+    tags:
+      - Community
+    url: https://calendar.tvdsb.ca/
+    debug_url: tvdsb.html
+    finders:
+      main:
+        css: div.calendar-list-container
+      events:
+        css: div.calendar-list-info
+      link:
+        css: a.calendar-list-title
+        attr: href
+        methods: value
+      title:
+        css: a.calendar-list-title
+        methods: text
+        replace:
+          - "^\\s*"
+          - "\\s*$"
+      datetime:
+        css: div.calendar-list-time
+        methods: text
+        replace:
+          - "^\\s*"
+          - "\\s*$"
+          - "^\\S+\\s+"
+          - [ "\\s+", " " ]
+          - ["-", "@"]

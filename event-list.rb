@@ -120,6 +120,9 @@ class EventFetcher
 
   def yield_event(latest_time, event_doc, title, time, seen, &block)
     throw :done if time.first > latest_time
+    return if @filters.any? { |filter|
+      filter.filtered(extract(event_doc, filter.matcher))
+    }
     puts "yield_event: finding link" if @debug
     raw_link = extract(event_doc, @link)
     link = begin
@@ -177,9 +180,6 @@ class EventFetcher
             date = extract(container, @timespec["date"])
             puts "found date #{date} for container" if @debug
             extract(container, @events).each do |event_doc|
-              next if @filters.any? { |filter|
-                filter.filtered(extract(event_doc, filter.matcher))
-              }
               puts "found event #{event_doc.class}" if @debug
               title = extract(event_doc, @title).gsub(/\|/, '\|')
               time = extract_time(event_doc, @timespec, date)
@@ -199,9 +199,6 @@ class EventFetcher
           e.each do |event_doc|
             i += 1
             puts "found event" if @debug
-            next if @filters.any? { |filter|
-              filter.filtered(extract(event_doc, filter.matcher))
-            }
             puts "each #{i}: finding title" if @debug
             title = extract(event_doc, @title).gsub(/\|/, '\|')
             puts "each #{i}: found title #{title.inspect}" if @debug

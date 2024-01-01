@@ -118,7 +118,7 @@ class EventFetcher
     @page_suffix.nil?
   end
 
-  def yield_event(latest_time, link, title, time, seen, &block)
+  def yield_event(latest_time, event_doc, link, title, time, seen, &block)
     throw :done if time.first > latest_time
     hashcode = title.hash ^ time.hash
     if seen.include?(hashcode)
@@ -168,22 +168,22 @@ class EventFetcher
             puts "found date container #{container.class}" if @debug
             date = extract(container, @timespec["date"])
             puts "found date #{date} for container" if @debug
-            extract(container, @events).each do |event|
+            extract(container, @events).each do |event_doc|
               next if @filters.any? { |filter|
-                filter.filtered(extract(event, filter.matcher))
+                filter.filtered(extract(event_doc, filter.matcher))
               }
-              puts "found event #{event.class}" if @debug
-              raw_link = extract(event, @link)
+              puts "found event #{event_doc.class}" if @debug
+              raw_link = extract(event_doc, @link)
               link = begin
                        @debug ? raw_link : URI::join(@url, raw_link)
                      rescue URI::InvalidURIError
                        url # replace bad URLs with current events page
                      end
-              title = extract(event, @title).gsub(/\|/, '\|')
-              time = extract_time(event, @timespec, date)
+              title = extract(event_doc, @title).gsub(/\|/, '\|')
+              time = extract_time(event_doc, @timespec, date)
               puts "yield_event: time is #{time.inspect}" if @debug
               page_event_count += 1
-              yield_event(latest_time, link, title, time, seen, &block)
+              yield_event(latest_time, event_doc, link, title, time, seen, &block)
             end
           end
         else
@@ -194,14 +194,14 @@ class EventFetcher
                 puts "events not found, give up" if @debug
                 throw :done
               end
-          e.each do |event|
+          e.each do |event_doc|
             i += 1
             puts "found event" if @debug
             next if @filters.any? { |filter|
-              filter.filtered(extract(event, filter.matcher))
+              filter.filtered(extract(event_doc, filter.matcher))
             }
             puts "each #{i}: finding link" if @debug
-            raw_link = extract(event, @link)
+            raw_link = extract(event_doc, @link)
             link = begin
                      @debug ? raw_link : URI::join(@url, raw_link)
                    rescue URI::InvalidURIError
@@ -209,11 +209,11 @@ class EventFetcher
                    end
             puts "each #{i}: found link #{link.inspect}" if @debug
             puts "each #{i}: finding title" if @debug
-            title = extract(event, @title).gsub(/\|/, '\|')
+            title = extract(event_doc, @title).gsub(/\|/, '\|')
             puts "each #{i}: found title #{title.inspect}" if @debug
-            time = extract_time(event, @timespec)
+            time = extract_time(event_doc, @timespec)
             page_event_count += 1
-            yield_event(latest_time, link, title, time, seen, &block)
+            yield_event(latest_time, event_doc, link, title, time, seen, &block)
           end
         end
         throw :done if single_page # give up now unless we are multi-page

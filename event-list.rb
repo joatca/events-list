@@ -118,7 +118,7 @@ class EventFetcher
     @page_suffix.nil?
   end
 
-  def yield_event(latest_time, event_doc, title, time, seen, &block)
+  def yield_event(latest_time, event_doc, time, seen, &block)
     throw :done if time.first > latest_time
     return if @filters.any? { |filter|
       filter.filtered(extract(event_doc, filter.matcher))
@@ -131,6 +131,9 @@ class EventFetcher
              url # replace bad URLs with current events page
            end
     puts "yield_event: found link #{link.inspect}" if @debug
+    puts "yield_event: finding title" if @debug
+    title = extract(event_doc, @title).gsub(/\|/, '\|')
+    puts "yield_event: found title #{title.inspect}" if @debug
     hashcode = title.hash ^ time.hash
     if seen.include?(hashcode)
       puts "yield_event: hashcode #{hashcode} already found" if @debug
@@ -181,11 +184,10 @@ class EventFetcher
             puts "found date #{date} for container" if @debug
             extract(container, @events).each do |event_doc|
               puts "found event #{event_doc.class}" if @debug
-              title = extract(event_doc, @title).gsub(/\|/, '\|')
               time = extract_time(event_doc, @timespec, date)
               puts "yield_event: time is #{time.inspect}" if @debug
               page_event_count += 1
-              yield_event(latest_time, event_doc, title, time, seen, &block)
+              yield_event(latest_time, event_doc, time, seen, &block)
             end
           end
         else
@@ -199,12 +201,9 @@ class EventFetcher
           e.each do |event_doc|
             i += 1
             puts "found event" if @debug
-            puts "each #{i}: finding title" if @debug
-            title = extract(event_doc, @title).gsub(/\|/, '\|')
-            puts "each #{i}: found title #{title.inspect}" if @debug
             time = extract_time(event_doc, @timespec)
             page_event_count += 1
-            yield_event(latest_time, event_doc, title, time, seen, &block)
+            yield_event(latest_time, event_doc, time, seen, &block)
           end
         end
         throw :done if single_page # give up now unless we are multi-page

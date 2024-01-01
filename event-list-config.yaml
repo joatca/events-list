@@ -6,14 +6,6 @@
 # and the optional `methods` is a Nokogiri method to call on the returning value, either a string or array
 #
 sources:
-  - name: Centennial Hall
-    abbrev: Cent
-    home: https://centennialhall.london.ca/london-event-listings.html
-    note: "Not supported: too difficult to scan website automatically"
-  - name: 100 Kellogg Lane
-    abbrev: 100K
-    home: https://100kellogglane.com/
-    note: "Not supported: no events listing"
   - name: Covent Garden Market
     abbrev: CGM
     tags:
@@ -396,3 +388,11 @@ sources:
           - "^\\S+\\s+"
           - [ "\\s+", " " ]
           - ["-", "@"]
+  - name: Centennial Hall
+    abbrev: Cent
+    home: https://centennialhall.london.ca/london-event-listings.html
+    note: "Not supported: too difficult to scan website automatically"
+  - name: 100 Kellogg Lane
+    abbrev: 100K
+    home: https://100kellogglane.com/
+    note: "Not supported: no events listing"

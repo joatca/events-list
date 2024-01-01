@@ -248,6 +248,12 @@ sources:
         css: div.views-field-field-date
         methods: text
         replace: "\\n"
+      filters: # exclude closed days
+        - match:
+            css: div.views-field-title a
+            methods: text
+          rules:
+            - exclude: CLOSED
   - name: Information London
     abbrev: Info
     tags:

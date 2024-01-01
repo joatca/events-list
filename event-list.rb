@@ -354,8 +354,8 @@ date: #{ now.iso8601 }
 draft: false
 ---
 
-| When  |  | Event (Venue) |
-|------:|-:|:--------------|
+| When  |  | Source | Event (Venue) |
+|------:|-:|:-------|:--------------|
 HEADER
   cur_date = nil
   events.select { |e| e.time_from >= earliest && e.time_from < latest }.sort { |a, b| a.time_from <=> b.time_from }.each do |e|
@@ -381,7 +381,7 @@ HEADER
            else
              e.time_from.strftime("%H:%M")
            end
-    out.puts "| #{date} | #{time} | [#{e.title}](#{e.link}) [(#{e.abbrev})](/about##{e.abbrev}) |"
+    out.puts "| #{date} | #{time} | [#{e.abbrev}](/about##{e.abbrev}) | [#{e.title}](#{e.link}) |"
   end
   out.puts "\nA machine-readable version of this page is available [here](/data.json)"
 end

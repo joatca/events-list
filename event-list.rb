@@ -118,7 +118,7 @@ class EventFetcher
     @page_suffix.nil?
   end
 
-  def yield_event(latest_time, event_doc, time, seen, &block)
+  def yield_event(latest_time, url, event_doc, time, seen, &block)
     throw :done if time.first > latest_time
     return if @filters.any? { |filter|
       filter.filtered(extract(event_doc, filter.matcher))
@@ -187,7 +187,7 @@ class EventFetcher
               time = extract_time(event_doc, @timespec, date)
               puts "yield_event: time is #{time.inspect}" if @debug
               page_event_count += 1
-              yield_event(latest_time, event_doc, time, seen, &block)
+              yield_event(latest_time, url, event_doc, time, seen, &block)
             end
           end
         else
@@ -203,7 +203,7 @@ class EventFetcher
             puts "found event" if @debug
             time = extract_time(event_doc, @timespec)
             page_event_count += 1
-            yield_event(latest_time, event_doc, time, seen, &block)
+            yield_event(latest_time, url, event_doc, time, seen, &block)
           end
         end
         throw :done if single_page # give up now unless we are multi-page
@@ -336,6 +336,7 @@ config.sources.each do |source|
     }
     end
   rescue Exception => e
+    raise
     if config.debug
       raise
     else

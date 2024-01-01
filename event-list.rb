@@ -354,8 +354,8 @@ date: #{ now.iso8601 }
 draft: false
 ---
 
-| When  |  | Source | Event (Venue) |
-|------:|-:|:-------|:--------------|
+| When  |  | Source | Event |
+|------:|-:|:-------|:------|
 HEADER
   cur_date = nil
   events.select { |e| e.time_from >= earliest && e.time_from < latest }.sort { |a, b| a.time_from <=> b.time_from }.each do |e|

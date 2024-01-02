@@ -321,7 +321,6 @@ config.sources.each do |source|
   next unless source["url"]
   next unless config.only.nil? || (config.only == source["abbrev"].downcase)
   source["pages"] << config.home_name
-  p source
   json_dump["sources"] << {
     "abbreviation" => source["abbrev"],
     "name" => source["name"],

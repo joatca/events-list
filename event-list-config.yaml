@@ -1,9 +1,9 @@
 sources:
   - name: Covent Garden Market
     abbrev: CGM
-    tags:
-      - Municipal
-      - Downtown
+    pages:
+      - downtown
+      - adult
     url: https://coventmarket.com/events/
     debug_url: "cgm.html"
     finders:
@@ -29,9 +29,10 @@ sources:
         replace: "-.*$"
   - name: Aeolian Hall
     abbrev: Aeol
-    tags:
-      - Downtown
-      - Culture
+    pages:
+      - downtown
+      - entertainment
+      - adult
     url: https://aeolianhall.ca/events/
     debug_url: "ah.html"
     finders:
@@ -60,10 +61,11 @@ sources:
         methods: "text"
   - name: Museum London
     abbrev: Museum
-    tags:
-      - Downtown
-      - Culture
-      - Education
+    pages:
+      - downtown
+      - entertainment
+      - culture
+      - adult
     url: https://museumlondon.ca/programs-events
     page_suffix: /p
     first_page: 1
@@ -89,9 +91,10 @@ sources:
         replace: "^\\S+ "
   - name: London Music Hall
     abbrev: LMH
-    tags:
-      - Downtown
-      - Culture
+    pages:
+      - downtown
+      - entertainment
+      - adult
     url: http://londonmusichall.com/upcoming-events/
     debug_url: lmh.html
     finders:
@@ -118,8 +121,10 @@ sources:
           - "/\\s*Show:.*$"
   - name: Budweiser Gardens
     abbrev: BudG
-    tags:
-      - Downtown
+    pages:
+      - downtown
+      - entertainment
+      - adult
     url: https://www.budweisergardens.com/events
     debug_url: bg.html
     finders:
@@ -141,9 +146,10 @@ sources:
         replace: "\\S+\\s*$"
   # - name: Wolf Performance Hall
   #   abbrev: Wolf
-  #   tags:
-  #     - Downtown
-  #     - Culture
+  #   pages:
+  #     - downtown
+  #     - entertainment
+  #     - adult
   #   url: https://www.lpl.ca/services-spaces/featured-spaces/wolf-performance-hall
   #   debug_url: wph.html
   #   finders:
@@ -171,8 +177,9 @@ sources:
   #       replace: "- \\s*.*"
   - name: Don Wright Faculty of Music
     abbrev: FMus
-    tags:
-      - Culture
+    pages:
+      - entertainment
+      - adult
     url: http://www.events.westernu.ca/events/music/
     debug_url: dwfm.html
     finders:
@@ -199,9 +206,10 @@ sources:
         methods: text
   - name: Grand Theatre
     abbrev: Grand
-    tags:
-      - Downtown
-      - Culture
+    pages:
+      - downtown
+      - entertainment
+      - adult
     url: https://www.grandtheatre.com/events
     debug_url: grand.html
     finders:
@@ -221,9 +229,9 @@ sources:
         methods: text
   - name: "London Children's Museum"
     abbrev: CMus
-    tags:
-      - Downtown
-      - Education
+    pages:
+      - downtown
+      - kids
     url: https://www.londonchildrensmuseum.ca/events
     page_suffix: ?page=
     first_page: 0
@@ -256,9 +264,10 @@ sources:
             - exclude: CLOSED
   - name: Information London
     abbrev: Info
-    tags:
-      - Downtown
-      - Community
+    pages:
+      - downtown
+      - community
+      - adult
     url: https://www.informationlondon.ca/Event/List
     debug_url: il.html
     finders:
@@ -289,8 +298,8 @@ sources:
           - " - .*"
   - name: Tourism London
     abbrev: Tour
-    tags:
-      - Community
+    pages:
+      - adult
     url: https://www.londontourism.ca/events/all-events
     page_suffix: /page/
     max_page: 30
@@ -330,9 +339,10 @@ sources:
             - exclude: "Museum London"
   - name: Eldon House
     abbrev: Eldon
-    tags:
-      - Community
-      - Downtown
+    pages:
+      - community
+      - downtown
+      - adult
     url: https://eldonhouse.ca/events/
     debug_url: eldon.html
     finders:
@@ -359,8 +369,9 @@ sources:
       range-sep: " (?:to|and) "
   - name: Thames Valley District School Board
     abbrev: TVDSB
-    tags:
-      - Community
+    pages:
+      - community
+      - adult
     url: https://calendar.tvdsb.ca/
     debug_url: tvdsb.html
     finders:
@@ -389,8 +400,9 @@ sources:
           - ["-", "@"]
   - name: London City Government Calendar
     abbrev: City
-    tags:
-      - Government
+    pages:
+      - community
+      - adult
     url: https://london.ca/government/calendar
     page_suffix: "?page="
     first_page: 0

@@ -25,6 +25,7 @@ class Config
       "debug" => false,
       "config_file" => "event-list-config.yaml",
       "hugo_dir" => ".",
+      "home_name" => "_index",
       "abbrev_name" => "about",
       "json_file" => "data.json",
       "only" => nil,
@@ -38,16 +39,19 @@ class Config
       parser.on("-c", "--config-file=FILE", "configuration/sources file") do |f|
         @options["config_file"] = f
       end
-      parser.on("-o", "--hugo-dir=FILE", "Hugo content directory") do |f|
+      parser.on("-o", "--hugo-dir=DIR", "Hugo content directory") do |f|
         @options["hugo_dir"] = f
       end
-      parser.on("-a", "--abbrev-name=FILE", "abbreviation page name to create") do |f|
+      parser.on("-h", "--home-name=NAME", "name of the home page") do |f|
+        @options["home_name"] = f
+      end
+      parser.on("-a", "--abbrev-name=NAME", "abbreviation page name to create") do |f|
         @options["abbrev_name"] = f
       end
       parser.on("-j", "--json-file=FILE", "JSON data dump") do |f|
         @options["json_file"] = f
       end
-      parser.on("--only=ABBREV", "only process this source") do |o|
+      parser.on("--only=NAME", "only process this source") do |o|
         @options["only"] = o.downcase
       end
     end.parse!
@@ -62,7 +66,7 @@ class Config
   end
 end
 
-Event = Struct.new('Event', :title, :abbrev, :link, :time_from, :time_to, :tags)
+Event = Struct.new('Event', :title, :abbrev, :link, :time_from, :time_to, :pages)
 
 class Filter
   attr_reader :matcher
@@ -92,8 +96,8 @@ end
 class EventFetcher
   def initialize(src, today, debug = false)
     @src, @today, @debug = src, today, debug
-    @name, @abbrev, @tags, @url, @page_suffix = [
-      "name", "abbrev", "tags", @debug ? "debug_url" : "url",
+    @name, @abbrev, @pages, @url, @page_suffix = [
+      "name", "abbrev", "pages", @debug ? "debug_url" : "url",
       @debug ? "debug_page_suffix" : "page_suffix"
     ].map { |k| @src[k] }
     @first_page = @src.has_key?("first_page") ? @src["first_page"].to_i : 1
@@ -144,13 +148,13 @@ class EventFetcher
     end
     if time.length == 1
       puts "yield_event single: time was #{time.inspect}" if @debug
-      yield Event.new(title, @abbrev, link, time.first, time.first, @tags)
+      yield Event.new(title, @abbrev, link, time.first, time.first, @pages)
     else
       first, last = time[0], time[1]
       puts "yield_event multiple: time was #{time.inspect} first #{first.inspect} last #{last.inspect}" if @debug
       first = @today.to_time if first.to_date < @today && last.to_date >= @today
       puts "yield_event multiple: time was #{time.inspect} corrected first #{first.inspect} last #{last.inspect}" if @debug
-      yield Event.new(title, @abbrev, link, first, last, @tags)
+      yield Event.new(title, @abbrev, link, first, last, @pages)
     end
   end
   
@@ -316,6 +320,8 @@ latest = earliest + 86400 * 180 # 6 months
 config.sources.each do |source|
   next unless source["url"]
   next unless config.only.nil? || (config.only == source["abbrev"].downcase)
+  source["pages"] << config.home_name
+  p source
   json_dump["sources"] << {
     "abbreviation" => source["abbrev"],
     "name" => source["name"],
@@ -346,10 +352,16 @@ config.sources.each do |source|
   source["note"] = fetch_count == 0 ? "Error: unable to fetch any events" : "#{fetch_count} events found"
 end
 
-File.open("#{config.hugo_dir}/_index.md", "w") do |out|
-  out.puts <<HEADER
+pages = config.sources.map { |s| s["pages"] }.flatten.uniq.compact
+puts "all pages #{pages}" if config.debug
+outputs = {}
+pages.each do |page|
+  page_file = "#{config.hugo_dir}/#{page}.md"
+  puts "writing #{page} to #{page_file}" if config.debug
+  outputs[page] = File.open(page_file, "w")
+  outputs[page].puts <<HEADER
 ---
-title: "Events"
+title: "Events#{ page == config.home_name ? "" : " - #{page}" }"
 date: #{ now.iso8601 }
 draft: false
 ---
@@ -357,39 +369,46 @@ draft: false
 | When  |  | Source | Event |
 |------:|-:|:-------|:------|
 HEADER
-  cur_date = nil
-  events.select { |e| e.time_from >= earliest && e.time_from < latest }.sort { |a, b| a.time_from <=> b.time_from }.each do |e|
-    days_until = e.time_from.to_date - today
-    date = if days_until == 0
-             "Today (#{e.time_from.strftime("%a")})"
-           elsif days_until == 1
-             "Tomorrow (#{e.time_from.strftime("%a")})"
-           elsif days_until < 7
-             e.time_from.strftime("%A")
-           elsif e.time_from.year == now.year
-             e.time_from.strftime("%a %b %d")
-           else
-             e.time_from.strftime("%a %b %d %Y")
-           end
-    if date != cur_date
-      cur_date = date
+end
+
+cur_dates = {}
+events.select { |e| e.time_from >= earliest && e.time_from < latest }.sort { |a, b| a.time_from <=> b.time_from }.each do |e|
+  days_until = e.time_from.to_date - today
+  date = if days_until == 0
+           "Today (#{e.time_from.strftime("%a")})"
+         elsif days_until == 1
+           "Tomorrow (#{e.time_from.strftime("%a")})"
+         elsif days_until < 7
+           e.time_from.strftime("%A")
+         elsif e.time_from.year == now.year
+           e.time_from.strftime("%a %b %d")
+         else
+           e.time_from.strftime("%a %b %d %Y")
+         end
+  time = if e.time_from.hour == 0 && e.time_from.min == 0
+           ""
+         else
+           e.time_from.strftime("%H:%M")
+         end
+  e.pages.each do |page|
+    page_date = date
+    if page_date != cur_dates[page]
+      cur_dates[page] = page_date
     else
-      date = ""
+      page_date = ""
     end
-    time = if e.time_from.hour == 0 && e.time_from.min == 0
-             ""
-           else
-             e.time_from.strftime("%H:%M")
-           end
-    out.puts "| #{date} | #{time} | [#{e.abbrev}](/about##{e.abbrev}) | [#{e.title}](#{e.link}) |"
+    outputs[page].puts "| #{page_date} | #{time} | [#{e.abbrev}](/about##{e.abbrev}) | [#{e.title}](#{e.link}) |"
   end
-  out.puts "\nA machine-readable version of this page is available [here](/data.json)"
+end
+outputs[config.home_name].puts "\nA machine-readable version of this page is available [here](/data.json)"
+outputs.each do |page, out|
+  out.close
 end
 
 File.open("#{config.hugo_dir}/#{config.abbrev_name}.md", "w") do |out|
   out.puts <<HEADER
 ---
-title: "Abbreviations"
+title: "About"
 date: #{ now.iso8601 }
 draft: false
 ---
@@ -403,6 +422,9 @@ HEADER
     out.puts "| **#{s["abbrev"]}** | [#{s["name"]}](#{s.has_key?("home") ? s["home"] : s["url"]}) | #{s["note"] ? "*"+s["note"]+"*" : ""}"
   end
   out.puts <<FOOTER
+
+View only a category:
+#{ pages.reject { |s| s == config.home_name }.map { |p| "[#{p.capitalize}](/#{p}/)" }.join(", ") }
 
 _Last updated #{now}_
 FOOTER

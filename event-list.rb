@@ -24,8 +24,8 @@ class Config
     @options = {
       "debug" => false,
       "config_file" => "event-list-config.yaml",
-      "output_file" => "_index.md",
-      "abbrev_file" => "abbrev.md",
+      "hugo_dir" => ".",
+      "abbrev_name" => "about",
       "json_file" => "data.json",
       "only" => nil,
     }
@@ -38,11 +38,11 @@ class Config
       parser.on("-c", "--config-file=FILE", "configuration/sources file") do |f|
         @options["config_file"] = f
       end
-      parser.on("-o", "--output-file=FILE", "main output file") do |f|
-        @options["output_file"] = f
+      parser.on("-o", "--hugo-dir=FILE", "Hugo content directory") do |f|
+        @options["hugo_dir"] = f
       end
-      parser.on("-a", "--abbrev-file=FILE", "abbreviation output file") do |f|
-        @options["abbrev_file"] = f
+      parser.on("-a", "--abbrev-name=FILE", "abbreviation page name to create") do |f|
+        @options["abbrev_name"] = f
       end
       parser.on("-j", "--json-file=FILE", "JSON data dump") do |f|
         @options["json_file"] = f
@@ -346,7 +346,7 @@ config.sources.each do |source|
   source["note"] = fetch_count == 0 ? "Error: unable to fetch any events" : "#{fetch_count} events found"
 end
 
-File.open(config.output_file, "w") do |out|
+File.open("#{config.hugo_dir}/_index.md", "w") do |out|
   out.puts <<HEADER
 ---
 title: "Events"
@@ -386,7 +386,7 @@ HEADER
   out.puts "\nA machine-readable version of this page is available [here](/data.json)"
 end
 
-File.open(config.abbrev_file, "w") do |out|
+File.open("#{config.hugo_dir}/#{config.abbrev_name}.md", "w") do |out|
   out.puts <<HEADER
 ---
 title: "Abbreviations"

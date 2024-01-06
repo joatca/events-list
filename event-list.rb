@@ -365,6 +365,9 @@ date: #{ now.iso8601 }
 draft: false
 ---
 
+View only a category:
+#{ pages.reject { |s| s == page }.map { |p| "[#{p == config.home_name ? "All" : p.capitalize}](#{p == config.home_name ? "/" : "/"+p+"/"})" }.sort.join(", ") }
+
 | When  |  | Source | Event |
 |------:|-:|:-------|:------|
 HEADER
@@ -421,9 +424,6 @@ HEADER
     out.puts "| **#{s["abbrev"]}** | [#{s["name"]}](#{s.has_key?("home") ? s["home"] : s["url"]}) | #{s["note"] ? "*"+s["note"]+"*" : ""}"
   end
   out.puts <<FOOTER
-
-View only a category:
-#{ pages.reject { |s| s == config.home_name }.map { |p| "[#{p.capitalize}](/#{p}/)" }.join(", ") }
 
 _Last updated #{now}_
 FOOTER

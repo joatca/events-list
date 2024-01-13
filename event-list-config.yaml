@@ -330,6 +330,7 @@ sources:
             - exclude: "London Children's Museum"
             - exclude: "London Knights"
             - exclude: "London Music Hall"
+            - exclude: "Rum Runners"
             - exclude: "Eldon House"
             - exclude: "Aeolian Hall"
             - exclude: "Covent Garden Market"

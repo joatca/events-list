@@ -430,6 +430,33 @@ sources:
         attr: datetime
         methods: value
       range-sep: "DUMMY" # just forces it not to split
+  - name: Post Stanley Festival Theatre - Off Season
+    abbrev: PSFTOff
+    pages:
+      - community
+      - adult
+    url: https://psft.ca/schedule/off-season-events/
+    debug_url: psftoff.html
+    finders:
+      main:
+        css: main.site-main
+      events:
+        css: article.psft-event
+      link:
+        css: h2.entry-title a
+        attr: href
+        methods: value
+      title:
+        css: h2.entry-title a
+        methods: text
+      date:
+        css: div.date-box div.date
+        methods: text
+        replace: 
+          - "^\\s*"
+          - "\\s*$"
+          - [ "\\s+", " " ]
+      range-sep: "DUMMY" # just forces it not to split
   - name: Centennial Hall
     abbrev: Cent
     home: https://centennialhall.london.ca/london-event-listings.html

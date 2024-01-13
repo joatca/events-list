@@ -511,6 +511,14 @@ sources:
           - "^\\s*"
           - "\\s*$"
           - [ "\\s+", " " ]
+      time:
+        css: span.event-time-localized
+        methods: text
+        replace: 
+          - "^\\s*"
+          - "\\s*$"
+          - [ "\\s+", " " ]
+          - [ " (\\d)", " - \\1" ] # if we ever use the end time then this is broken
   - name: Centennial Hall
     abbrev: Cent
     home: https://centennialhall.london.ca/london-event-listings.html

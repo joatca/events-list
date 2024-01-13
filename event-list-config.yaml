@@ -485,6 +485,32 @@ sources:
           - "^\\s*"
           - "\\s*$"
           - [ "\\s+", " " ]
+  - name: Hello Maker
+    abbrev: Maker
+    pages:
+      - community
+      - adult
+    url: https://www.hellomaker.ca/events
+    debug_url: maker.html
+    finders:
+      main:
+        css: div.eventlist
+      events:
+        css: article.eventlist-event
+      link:
+        css: a.eventlist-title-link
+        attr: href
+        methods: value
+      title:
+        css: a.eventlist-title-link
+        methods: text
+      date:
+        css: div.eventlist-datetag
+        methods: text
+        replace: 
+          - "^\\s*"
+          - "\\s*$"
+          - [ "\\s+", " " ]
   - name: Centennial Hall
     abbrev: Cent
     home: https://centennialhall.london.ca/london-event-listings.html

@@ -519,6 +519,35 @@ sources:
           - "\\s*$"
           - [ "\\s+", " " ]
           - [ " (\\d)", " - \\1" ] # if we ever use the end time then this is broken
+  - name: RBP Place
+    abbrev: RBCP
+    pages:
+      - community
+      - adult
+    url: https://www.rbcplacelondon.com/events
+    debug_url: rbcp.html
+    finders:
+      main:
+        css: div.layout-content div#content div.item-list
+      events:
+        css: li div.views-field-title a
+      link:
+        attr: href
+        methods: value
+      title:
+        methods: text
+        replace:
+          - "^\\s*"
+          - "\\s*$"
+          - [ "\\s+", " " ]
+          - " - .*$"
+      date:
+        methods: text
+        replace:
+          - "^\\s*"
+          - "\\s*$"
+          - [ "\\s+", " " ]
+          - "^.* - "
   - name: Centennial Hall
     abbrev: Cent
     home: https://centennialhall.london.ca/london-event-listings.html

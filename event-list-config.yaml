@@ -338,6 +338,7 @@ sources:
             - exclude: "Museum London"
             #- exclude: "Wolf Performance"
             - exclude: "Museum London"
+            - exclude: "Port Stanley Festival Theatre"
   - name: Eldon House
     abbrev: Eldon
     pages:

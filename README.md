@@ -6,6 +6,8 @@ The import file is the driver file `event-list-config.rb`
 
 Each source describes how to scrape a particular site. Apart from descriptive information it contains several possible `finders`:
 
+| Name       | Purpose                                                                   |
+|------------|---------------------------------------------------------------------------|
 | `main`     | the section of the site containing a list of events                       |
 | `events`   | how to find each event within `main`                                      |
 | `link`     | within each event, how to find a web link to the event                    |
@@ -17,6 +19,8 @@ Each source describes how to scrape a particular site. Apart from descriptive in
 
 Each finder has at least one of:
 
+| Name   | Purpose                                                                                        |
+|--------|------------------------------------------------------------------------------------------------|
 | `css`  | a [Nokogiri](https://nokogiri.org/)-compatible CSS specifier to find the HTML element of group |
 | `proc` | a Ruby lambda or `Proc` object that the found element is passed to to extract text             |
 

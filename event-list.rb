@@ -18,51 +18,51 @@ require 'json'
 require 'yaml'
 require 'nokogiri'
 require 'chronic'
+require 'pp'
 
 class Config
   def initialize
     @options = {
-      "debug" => false,
-      "config_file" => "event-list-config.yaml",
-      "hugo_dir" => ".",
-      "home_name" => "_index",
-      "abbrev_name" => "about",
-      "json_file" => "data.json",
-      "only" => nil,
+      :debug => false,
+      :config_file => "event-list-config.rb",
+      :hugo_dir => ".",
+      :home_name => "_index",
+      :abbrev_name => "about",
+      :json_file => "data.json",
+      :only => nil,
     }
     OptionParser.new do |parser|
       parser.banner = "Usage: #{$0} [options]"
       
       parser.on("-d", "--[no-]debug", "Show debug messages and read from debug URLs") do |v|
-        @options["debug"] = v
+        @options[:debug] = v
       end
       parser.on("-c", "--config-file=FILE", "configuration/sources file") do |f|
-        @options["config_file"] = f
+        @options[:config_file] = f
       end
       parser.on("-o", "--hugo-dir=DIR", "Hugo content directory") do |f|
-        @options["hugo_dir"] = f
+        @options[:hugo_dir] = f
       end
       parser.on("-h", "--home-name=NAME", "name of the home page") do |f|
-        @options["home_name"] = f
+        @options[:home_name] = f
       end
       parser.on("-a", "--abbrev-name=NAME", "abbreviation page name to create") do |f|
-        @options["abbrev_name"] = f
+        @options[:abbrev_name] = f
       end
       parser.on("-j", "--json-file=FILE", "JSON data dump") do |f|
-        @options["json_file"] = f
+        @options[:json_file] = f
       end
       parser.on("--only=NAME", "only process this source") do |o|
-        @options["only"] = o.downcase
+        @options[:only] = o.downcase
       end
     end.parse!
-    cfdata = YAML.load(File.read(@options["config_file"]))
+    cfdata = eval(File.read(@options[:config_file]))
     @options.merge!(cfdata)
   end
 
   def method_missing(name)
-    o = name.to_s
-    raise "unknown option #{name}" unless @options.has_key?(o)
-    @options[o]
+    raise "unknown option #{name}" unless @options.has_key?(name)
+    @options[name]
   end
 end
 
@@ -72,24 +72,15 @@ class Filter
   attr_reader :matcher
   
   def initialize(h)
-    raise "need matcher" unless h.has_key?("match")
-    @matcher = h["match"]
-    raise "need rules" unless h["rules"].is_a?(Array)
-    @rules = h["rules"]
+    raise "need matcher" unless h.has_key?(:css)
+    @matcher = h[:css]
+    raise "need condition" unless h.has_key?(:if) && h[:if].is_a?(Proc)
+    @if = h[:if]
   end
 
   # return true if we should filter out this event
   def filtered(data)
-    @rules.each do |rule|
-      if rule.has_key?("exclude")
-        return true if data =~ /#{rule["exclude"]}/
-      elsif rule.has_key?("include")
-        return true unless data =~ /#{rule["include"]}/
-      else
-        raise "bad rule set #{@rules.inspect}"
-      end
-    end
-    return false
+    return @if.call(data)
   end
 end
 
@@ -97,18 +88,18 @@ class EventFetcher
   def initialize(src, today, debug = false)
     @src, @today, @debug = src, today, debug
     @name, @abbrev, @pages, @url, @page_suffix = [
-      "name", "abbrev", "pages", @debug ? "debug_url" : "url",
-      @debug ? "debug_page_suffix" : "page_suffix"
+      :name, :abbrev, :pages, @debug ? :debug_url : :url,
+      @debug ? :debug_page_suffix : :page_suffix
     ].map { |k| @src[k] }
-    @first_page = @src.has_key?("first_page") ? @src["first_page"].to_i : 1
-    @max_page = @src.has_key?("max_page") ? @src["max_page"].to_i : 10
+    @first_page = @src.has_key?(:first_page) ? @src[:first_page].to_i : 1
+    @max_page = @src.has_key?(:max_page) ? @src[:max_page].to_i : 10
     @main, @date_containers, @events, @link, @title = [
-      "main", "date_containers", "events", "link", "title"
-    ].map { |k| @src["finders"][k] }
-    @filters = (@src["finders"]["filters"] || []).map { |h| Filter.new(h) }
+      :main, :date_containers, :events, :link, :title
+    ].map { |k| @src[:finders][k] }
+    @filters = @src[:finders][:filters] || []
     @timespec = [
-      "date", "time", "datetime", "range-sep"
-    ].map { |k| [k, @src["finders"][k]] }.to_h
+      :date, :time, :datetime, :rangesep
+    ].map { |k| [k, @src[:finders][k]] }.to_h
   end
 
   def page_url(page)
@@ -125,7 +116,12 @@ class EventFetcher
   def yield_event(latest_time, url, event_doc, time, seen, &block)
     throw :done if time.first > latest_time
     return if @filters.any? { |filter|
-      filter.filtered(extract(event_doc, filter.matcher))
+      if filter.has_key?(:if)
+        data = extract(event_doc, filter)
+        filter[:if].call(data)
+      else
+        false
+      end
     }
     puts "yield_event: finding link" if @debug
     raw_link = extract(event_doc, @link)
@@ -184,7 +180,7 @@ class EventFetcher
           puts "Found containers #{c.class}" if @debug
           c.each do |container|
             puts "found date container #{container.class}" if @debug
-            date = extract(container, @timespec["date"])
+            date = extract(container, @timespec[:date])
             puts "found date #{date} for container" if @debug
             extract(container, @events).each do |event_doc|
               puts "found event #{event_doc.class}" if @debug
@@ -202,6 +198,7 @@ class EventFetcher
                 puts "events not found, give up" if @debug
                 throw :done
               end
+          pp e if @debug
           e.each do |event_doc|
             i += 1
             puts "found event" if @debug
@@ -235,58 +232,46 @@ class EventFetcher
     begin
       item = from
       puts "initial item #{item.class}" if @debug
-      if spec["css"]
-        item = item.css(spec["css"])
+      if spec[:css]
+        item = item.css(spec[:css])
         puts "after css #{item.inspect}" if @debug
       end
-      if spec["attr"]
-        item = item.attribute(spec["attr"])
-        puts "after attr #{item.inspect}" if @debug
-      end
-      ensure_array(spec["methods"]).each do |method|
-        item = item.send(method)
-        puts "after method #{method} #{item.inspect}" if @debug
-      end
-      ensure_array(spec["replace"]).each do |replace|
-        rep = replace.is_a?(Array) ? replace : [ replace,  ""]
-        puts "replace #{replace.inspect} becomes #{rep.inspect}" if @debug
-        item.gsub!(/#{rep.first}/m, rep.last)
-        puts "after replace #{replace.inspect} #{item.inspect}" if @debug
+      if spec[:do]
+        item = spec[:do].call(item)
       end
       puts "final item #{item.inspect}" if @debug
       item
-    # rescue NoMethodError
-    #   "unknown"
+    #rescue NoMethodError
+    #  "unknown"
     end
   end
 
   def extract_time(from, spec, date_prefix = nil)
     timetext = ""
-    if date_prefix && spec["time"]
-      timetext += date_prefix + " " + extract(from, spec["time"])
-    elsif spec["date"]
-      timetext += extract(from, spec["date"])
-      if spec["time"]
-        timetext += " " + extract(from, spec["time"])
+    if date_prefix && spec[:time]
+      timetext += date_prefix + " " + extract(from, spec[:time])
+    elsif spec[:date]
+      timetext += extract(from, spec[:date])
+      if spec[:time]
+        timetext += " " + extract(from, spec[:time])
       end
-    elsif spec["datetime"]
-      timetext += extract(from, spec["datetime"])
+    elsif spec[:datetime]
+      timetext += extract(from, spec[:datetime])
     else
       raise "bad date and time spec #{spec.inspect}"
     end
     puts "extract_time: spec is #{spec.inspect}" if @debug
-    range_sep = spec["range-sep"] || "-"
+    rangesep = spec[:rangesep] || /\s*-\s*/
     timetext.gsub!(/\s{2,}/m, ' ')
     puts "extract_time: found timetext #{timetext}" if @debug
-    split = /\s*#{range_sep}\s*/m
-    puts "extract_time: about to split timetext with #{split.inspect}" if @debug
-    timetextary = timetext.split(split)
+    puts "extract_time: about to split timetext with #{rangesep.inspect}" if @debug
+    timetextary = timetext.split(rangesep)
     raise "too many time components #{timetextary.inspect}" unless timetextary.length <= 2
     puts "extract_time: text time after split #{timetextary.inspect}" if @debug
-    time = [ Chronic.parse(spec["time"] || spec["datetime"] ? timetextary[0] : timetextary[0] + " 00:00:00") ]
+    time = [ Chronic.parse(spec[:time] || spec[:datetime] ? timetextary[0] : timetextary[0] + " 00:00:00") ]
     if timetextary.length > 1
       time.push(Chronic.parse(
-                  if spec["time"] || spec["datetime"]
+                  if spec[:time] || spec[:datetime]
                     if timetextary[1] =~ /^\d{1,2}:/ # assume it's a time only
                       time[0].to_date.to_s + " " + timetextary[1]
                     else
@@ -298,7 +283,7 @@ class EventFetcher
                 )
                )
     end
-    timetextary.map! { |t| spec["time"] || spec["datetime"] ? t : t + " 00:00:00" }.map! { |t| Chronic.parse(t) }
+    timetextary.map! { |t| spec[:time] || spec[:datetime] ? t : t + " 00:00:00" }.map! { |t| Chronic.parse(t) }
     puts "extract_time: time after split #{timetextary.inspect} length #{timetextary.length}" if @debug
     raise "time parse of #{timetext} failed" if timetextary.length == 0
     timetextary
@@ -318,13 +303,13 @@ earliest = today.to_time # midnight this morning
 latest = earliest + 86400 * 180 # 6 months
 
 config.sources.each do |source|
-  next unless source["url"]
-  next unless config.only.nil? || (config.only == source["abbrev"].downcase)
-  source["pages"] << config.home_name
+  next unless source[:url]
+  next unless config.only.nil? || (config.only == source[:abbrev].downcase)
+  source[:pages] << config.home_name
   json_dump["sources"] << {
-    "abbreviation" => source["abbrev"],
-    "name" => source["name"],
-    "home" => source["home"],
+    "abbreviation" => source[:abbrev],
+    "name" => source[:name],
+    "home" => source[:home],
     "events" => [],
   }
   fetch_count = 0
@@ -334,11 +319,11 @@ config.sources.each do |source|
       fetch_count += 1
       events << event
       json_dump["sources"].last["events"] << {
-      "title" => event.title,
-      "link" => event.link,
-      "source" => event.abbrev,
-      "time" => event.time_from.iso8601,
-    }
+        "title" => event.title,
+        "link" => event.link,
+        "source" => event.abbrev,
+        "time" => event.time_from.iso8601,
+      }
     end
   rescue Exception => e
     if config.debug
@@ -347,10 +332,10 @@ config.sources.each do |source|
       STDERR.puts "error loading #{source}: #{e.class} #{e.message}"
     end
   end
-  source["note"] = fetch_count == 0 ? "Error: unable to fetch any events" : "#{fetch_count} events found"
+  source[:note] = fetch_count == 0 ? "Error: unable to fetch any events" : "#{fetch_count} events found"
 end
 
-pages = config.sources.map { |s| s["pages"] }.flatten.uniq.compact
+pages = config.sources.map { |s| s[:pages] }.flatten.uniq.compact
 puts "all pages #{pages}" if config.debug
 outputs = {}
 pages.each do |page|
@@ -419,8 +404,8 @@ This page knows about events on these sites.
 |   |       | |
 |:--------------|:------|:--|
 HEADER
-  config.sources.sort { |a, b| a["abbrev"] <=> b["abbrev"] }.each do |s|
-    out.puts "| **#{s["abbrev"]}** | [#{s["name"]}](#{s.has_key?("home") ? s["home"] : s["url"]}) | #{s["note"] ? "*"+s["note"]+"*" : ""}"
+  config.sources.sort { |a, b| a[:abbrev] <=> b[:abbrev] }.each do |s|
+    out.puts "| **#{s[:abbrev]}** | [#{s[:name]}](#{s.has_key?("home") ? s[:home] : s[:url]}) | #{s[:note] ? "*"+s[:note]+"*" : ""}"
   end
   out.puts <<FOOTER
 

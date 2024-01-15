@@ -31,11 +31,11 @@ Note that the output of `css` is always a Nokogiri object so if you need plain t
 
 For each source the code proceeds as follows:
 
-1. find `main`
-2. find and loop over each of the `events`
-  1. if any `filters` exist and any of them return `true`, skip this event
-  2. fetch `link` and `title`
-  3. if only `date` is given, pass it to `Chronic` to parse into a timestamp; if both `date` and `time` are
-     given then are joined with a space and passed to `Chronic`, otherwise if `datetime` is given pass the
-     contents to `Chronic`. It is an error to have neither `date` nor `datetime` but `time` is optional.
+- find `main`
+  - within `main` find and loop over each of the `events`
+    - if any `filters` exist and any of them return `true`, skip this event
+    - fetch `link` and `title`
+    - if only `date` is given, pass it to `Chronic` to parse into a timestamp; if both `date` and `time` are
+      given then are joined with a space and passed to `Chronic`, otherwise if `datetime` is given pass the
+      contents to `Chronic`. It is an error to have neither `date` nor `datetime` but `time` is optional.
 

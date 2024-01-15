@@ -236,8 +236,8 @@ class EventFetcher
         item = item.css(spec[:css])
         puts "after css #{item.inspect}" if @debug
       end
-      if spec[:do]
-        item = spec[:do].call(item)
+      if spec[:proc]
+        item = spec[:proc].call(item)
       end
       puts "final item #{item.inspect}" if @debug
       item

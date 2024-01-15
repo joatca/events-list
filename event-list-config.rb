@@ -14,19 +14,19 @@
           css: "div.grid-item a"
         },
         link: {
-          do: ->(x) { x.attribute("href").value }
+          proc: ->(x) { x.attribute("href").value }
         },
         title: {
           css: "h3.event-title",
-          do: ->(x) { x.text }
+          proc: ->(x) { x.text }
         },
         date: {
           css: "div.event-date-time strong",
-          do: ->(x) { x.text.gsub(/-.*$/, '') }
+          proc: ->(x) { x.text.gsub(/-.*$/, '') }
         },
         time: {
           css: "div.event-date-time div",
-          do: ->(x) { x.text.gsub(/-.*$/, '') }
+          proc: ->(x) { x.text.gsub(/-.*$/, '') }
         }
       }
     },
@@ -45,19 +45,19 @@
         },
         link: {
           css: "a.link-wrap",
-          do: ->(x) { x.attribute("href").value }
+          proc: ->(x) { x.attribute("href").value }
         },
         title: {
           css: "div.event-title",
-          do: ->(x) { x.text.gsub(/^\s+(.*)\s+$/, '\1') }
+          proc: ->(x) { x.text.gsub(/^\s+(.*)\s+$/, '\1') }
         },
         date: {
           css: "span.event-date",
-          do: ->(x) { x.text.gsub(/^\S+ /, '') }
+          proc: ->(x) { x.text.gsub(/^\S+ /, '') }
         },
         time: {
           css: "span.event-time",
-          do: ->(x) { x.text }
+          proc: ->(x) { x.text }
         }
       }
     },
@@ -80,15 +80,15 @@
         },
         link: {
           css: "a.num",
-          do: ->(x) { x.attribute("href").value }
+          proc: ->(x) { x.attribute("href").value }
         },
         title: {
           css: "a.num h3",
-          do: ->(x) { x.text }
+          proc: ->(x) { x.text }
         },
         datetime: {
           css: "span.event-date",
-          do: ->(x) { x.text.gsub(/^\S+ "/, '') }
+          proc: ->(x) { x.text.gsub(/^\S+ "/, '') }
         }
       }
     },
@@ -107,19 +107,19 @@
         },
         link: {
           css: "div.event-info h2 a",
-          do: ->(x) { x.attribute("href").value }
+          proc: ->(x) { x.attribute("href").value }
         },
         title: {
           css: "div.event-info h2 a",
-          do: ->(x) { x.text }
+          proc: ->(x) { x.text }
         },
         date: {
           css: "div.event-info div.date",
-          do: ->(x) { x.text }
+          proc: ->(x) { x.text }
         },
         time: {
           css: "div.event-info div.times",
-          do: ->(x) { x.text.gsub("Doors:", '').gsub(/\/\s*Show:.*$/, '') }
+          proc: ->(x) { x.text.gsub("Doors:", '').gsub(/\/\s*Show:.*$/, '') }
         }
       }
     },
@@ -138,15 +138,15 @@
         },
         link: {
           css: "h3.m-eventItem__title a",
-          do: ->(x) { x.attribute("href").value }
+          proc: ->(x) { x.attribute("href").value }
         },
         title: {
           css: "h3.m-eventItem__title a",
-          do: ->(x) { x.text }
+          proc: ->(x) { x.text }
         },
         date: {
           css: "div.m-eventItem__date",
-          do: ->(x) { x.text.gsub(/\S+\s*$/, '') }
+          proc: ->(x) { x.text.gsub(/\S+\s*$/, '') }
         }
       }
     },
@@ -165,22 +165,22 @@
         },
         date: {
           css: "h2",
-          do: ->(x) { x.text.gsub(/^\S+\s+/, '') }
+          proc: ->(x) { x.text.gsub(/^\S+\s+/, '') }
         },
         events: {
           css: "div.detailColFull"
         },
         link: {
           css: "div.detailColRight a",
-          do: ->(x) { x.attribute("href").value }
+          proc: ->(x) { x.attribute("href").value }
         },
         title: {
           css: "div.detailColRight a",
-          do: ->(x) { x.text }
+          proc: ->(x) { x.text }
         },
         time: {
           css: "div.detailColLeft",
-          do: ->(x) { x.text }
+          proc: ->(x) { x.text }
         }
       }
     },
@@ -199,15 +199,15 @@
         },
         link: {
           css: "a",
-          do: ->(x) { x.attribute("href").value }
+          proc: ->(x) { x.attribute("href").value }
         },
         title: {
           css: "div.cont span",
-          do: ->(x) { x.text }
+          proc: ->(x) { x.text }
         },
         date: {
           css: "div.field-date",
-          do: ->(x) { x.text }
+          proc: ->(x) { x.text }
         }
       }
     },
@@ -230,15 +230,15 @@
         },
         link: {
           css: "div.views-field-title a",
-          do: ->(x) { x.attribute("href").value.delete("\n") }
+          proc: ->(x) { x.attribute("href").value.delete("\n") }
         },
         title: {
           css: "div.views-field-title a",
-          do: ->(x) { x.text.delete("\n") }
+          proc: ->(x) { x.text.delete("\n") }
         },
         datetime: {
           css: "div.views-field-field-date",
-          do: ->(x) { x.text.delete("\n") }
+          proc: ->(x) { x.text.delete("\n") }
         },
         filters: [
           {
@@ -262,19 +262,19 @@
           css: "a.event-div"
         },
         link: {
-          do: ->(x) { x.attribute("href").value }
+          proc: ->(x) { x.attribute("href").value }
         },
         title: {
           css: "div.event-info li.event-title",
-          do: ->(x) { x.text.gsub(/^\s+/, '') }
+          proc: ->(x) { x.text.gsub(/^\s+/, '') }
         },
         date: {
           css: "div.date-of-event",
-          do: ->(x) { x.text.delete("\r").delete("\n").gsub(/\s*\S+\s*$/, '') }
+          proc: ->(x) { x.text.delete("\r").delete("\n").gsub(/\s*\S+\s*$/, '') }
         },
         time: {
           css: "ul.event-details",
-          do: ->(x) { x.text.delete("\n").gsub(/ - .*/, '') }
+          proc: ->(x) { x.text.delete("\n").gsub(/ - .*/, '') }
         }
       }
     },
@@ -295,15 +295,15 @@
           css: "li.before-slide a"
         },
         link: {
-          do: ->(x) { x.attribute("href").value }
+          proc: ->(x) { x.attribute("href").value }
         },
         title: {
           css: "div.description h3",
-          do: ->(x) { x.text }
+          proc: ->(x) { x.text }
         },
         date: {
           css: "div.description time",
-          do: ->(x) {
+          proc: ->(x) {
             x.text.
               gsub(/^(Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday),\s+/, '').
               gsub(/(\w+)\s+(\d+)\s+-\s+(\d+)/, '\1 \2 - \1 \3')
@@ -336,15 +336,15 @@
         },
         link: {
           css: "div.elementor-button-wrapper a.elementor-button",
-          do: ->(x) { x.attribute("href").value }
+          proc: ->(x) { x.attribute("href").value }
         },
         title: {
           css: "div.elementor-element-ad95776 h3.elementor-heading-title",
-          do: ->(x) { x.text }
+          proc: ->(x) { x.text }
         },
         date: {
           css: "div.elementor-element-c029367",
-          do: ->(x) {
+          proc: ->(x) {
             x.text.
               gsub(/^[\r\n\t]+/, '').
               gsub(/(Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday),\s+/, '').
@@ -371,15 +371,15 @@
         },
         link: {
           css: "a.calendar-list-title",
-          do: ->(x) { x.attribute("href").value }
+          proc: ->(x) { x.attribute("href").value }
         },
         title: {
           css: "a.calendar-list-title",
-          do: ->(x) { x.text.gsub(/^\s+/, '').gsub(/\s+$/, '') }
+          proc: ->(x) { x.text.gsub(/^\s+/, '').gsub(/\s+$/, '') }
         },
         datetime: {
           css: "div.calendar-list-time",
-          do: ->(x) { x.text.gsub(/^\s*/, '').gsub(/\s*$/, '').gsub(/^\S+\s+/, '').gsub(/\s+/, ' ').gsub(/-/, '@') }
+          proc: ->(x) { x.text.gsub(/^\s*/, '').gsub(/\s*$/, '').gsub(/^\S+\s+/, '').gsub(/\s+/, ' ').gsub(/-/, '@') }
         }
       }
     },
@@ -402,15 +402,15 @@
         },
         link: {
           css: "h2.teaser__title a",
-          do: ->(x) { x.attribute("href").value }
+          proc: ->(x) { x.attribute("href").value }
         },
         title: {
           css: "h2.teaser__title a span.field--name-title",
-          do: ->(x) { x.text.gsub(/^\s+/, '').gsub(/\s+$/, '') }
+          proc: ->(x) { x.text.gsub(/^\s+/, '').gsub(/\s+$/, '') }
         },
         datetime: {
           css: "div.teaser__date time.datetime",
-          do: ->(x) { x.attribute("datetime").value }
+          proc: ->(x) { x.attribute("datetime").value }
         },
         rangesep: /DUMMY/
       }
@@ -430,15 +430,15 @@
         },
         link: {
           css: "h2.entry-title a",
-          do: ->(x) { x.attribute("href").value }
+          proc: ->(x) { x.attribute("href").value }
         },
         title: {
           css: "h2.entry-title a",
-          do: ->(x) { x.text }
+          proc: ->(x) { x.text }
         },
         date: {
           css: "div.date-box div.date",
-          do: ->(x) { x.text.gsub(/^\s+/, '').gsub(/\s+$/, '').gsub(/\s+/, ' ') }
+          proc: ->(x) { x.text.gsub(/^\s+/, '').gsub(/\s+$/, '').gsub(/\s+/, ' ') }
         }
       }
     },
@@ -457,15 +457,15 @@
         },
         link: {
           css: "h2.entry-title a",
-          do: ->(x) { x.attribute("href").value }
+          proc: ->(x) { x.attribute("href").value }
         },
         title: {
           css: "h2.entry-title a",
-          do: ->(x) { x.text }
+          proc: ->(x) { x.text }
         },
         date: {
           css: "div.date-box div.date",
-          do: ->(x) { x.text.gsub(/^\s+/, '').gsub(/\s+$/, '').gsub(/\s+/, ' ') }
+          proc: ->(x) { x.text.gsub(/^\s+/, '').gsub(/\s+$/, '').gsub(/\s+/, ' ') }
         }
       }
     },
@@ -484,19 +484,19 @@
         },
         link: {
           css: "a.eventlist-title-link",
-          do: ->(x) { x.attribute("href").value }
+          proc: ->(x) { x.attribute("href").value }
         },
         title: {
           css: "a.eventlist-title-link",
-          do: ->(x) { x.text }
+          proc: ->(x) { x.text }
         },
         date: {
           css: "div.eventlist-datetag",
-          do: ->(x) { x.text.gsub(/^\s+/, '').gsub(/\s+$/, '').gsub(/\s+/, ' ') }
+          proc: ->(x) { x.text.gsub(/^\s+/, '').gsub(/\s+$/, '').gsub(/\s+/, ' ') }
         },
         time: {
           css: "span.event-time-localized",
-          do: ->(x) {
+          proc: ->(x) {
             x.text.gsub(/^\s+/, '').gsub(/\s+$/, '').gsub(/\s+/, ' ').
               gsub(/ (\d)/, ' - \1') # if we ever use the end time then this is broken
           }
@@ -517,13 +517,13 @@
           css: "li div.views-field-title a"
         },
         link: {
-          do: ->(x) { x.attribute("href").value }
+          proc: ->(x) { x.attribute("href").value }
         },
         title: {
-          do: ->(x) { x.text.gsub(/^\s+/, '').gsub(/\s+$/, '').gsub(/\s+/, ' ').gsub(/ - .*$/, '') }
+          proc: ->(x) { x.text.gsub(/^\s+/, '').gsub(/\s+$/, '').gsub(/\s+/, ' ').gsub(/ - .*$/, '') }
         },
         date: {
-          do: ->(x) {
+          proc: ->(x) {
             x.text.gsub(/^\s+/, '').gsub(/\s+$/, '').gsub(/\s+/, ' ').gsub(/^.* - /, '').
               gsub(/(\w+)\s+(\d+)-(\d+)/, '\1 \2 - \1 \3')
           }

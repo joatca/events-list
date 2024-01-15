@@ -35,7 +35,8 @@ For each source the code proceeds as follows:
   - within `main` find and loop over each of the `events`
     - if any `filters` exist and any of them return `true`, skip this event
     - fetch `link` and `title`
-    - if only `date` is given, pass it to `Chronic` to parse into a timestamp; if both `date` and `time` are
-      given then are joined with a space and passed to `Chronic`, otherwise if `datetime` is given pass the
-      contents to `Chronic`. It is an error to have neither `date` nor `datetime` but `time` is optional.
+    - if only `date` is given, pass it to [Chronic](https://github.com/mojombo/chronic) to parse into a
+      timestamp; if both `date` and `time` are given then are joined with a space and passed to `Chronic`,
+      otherwise if `datetime` is given pass the contents to `Chronic`. It is an error to have neither `date` nor
+      `datetime` but `time` is optional.
 

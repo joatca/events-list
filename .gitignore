@@ -1,6 +1,7 @@
 *~
 *.html*
 *.md
+!README.md
 *.json
 vendor/
 out/

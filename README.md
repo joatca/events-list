@@ -19,10 +19,11 @@ Each source describes how to scrape a particular site. Apart from descriptive in
 
 Each finder has at least one of:
 
-| Name   | Purpose                                                                                        |
-|--------|------------------------------------------------------------------------------------------------|
-| `css`  | a [Nokogiri](https://nokogiri.org/)-compatible CSS specifier to find the HTML element of group |
-| `proc` | a Ruby lambda or `Proc` object that the found element is passed to to extract text             |
+| Name   | Purpose                                                                                                                                        |
+|--------|------------------------------------------------------------------------------------------------------------------------------------------------|
+| `css`  | a [Nokogiri](https://nokogiri.org/)-compatible CSS specifier to find the HTML element of group                                                 |
+| `proc` | a Ruby lambda or `Proc` object that the found element is passed to to extract text                                                             |
+| `if`   | only for filters, a Ruby lambda or `Proc` object that should return a truthy value if the event should be skipped and otherwise a falsey value |
 
 For each finder, if `css:` exists then the current HTML document is searched for that CSS. For `main` this is the entire document, for `events` is the the result from `main` and for everything else it is the subdocument for the current event. If `proc` exists then the found subdocument is passed to the subdocument and whatever it returns is the result. `proc` exists to do arbitrary processing and manging of the raw data from the website.
 

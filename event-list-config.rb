@@ -534,13 +534,18 @@
       name: "Centennial Hall",
       abbrev: "Cent",
       home: "https://centennialhall.london.ca/london-event-listings.html",
-      note: "Not supported: too difficult to scan website automatically"
+      note: "Not supported: website not sufficiently structured to process"
     },
     {
       name: "100 Kellogg Lane",
       abbrev: "100K",
       home: "https://100kellogglane.com/",
-      note: "Not supported: no events listing"
+      note: "Not supported: no events page"
     }
+    {
+      name: "Carrefour communautaire francophone de london"
+      abbrev: "CCFL"
+      home: "https://www.ccflondon.ca/calendrier-communautaire"
+      note: "Not supported: website not sufficiently structured to process"
   ]
 }

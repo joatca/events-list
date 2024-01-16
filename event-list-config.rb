@@ -541,11 +541,12 @@
       abbrev: "100K",
       home: "https://100kellogglane.com/",
       note: "Not supported: no events page"
-    }
+    },
     {
-      name: "Carrefour communautaire francophone de london"
-      abbrev: "CCFL"
-      home: "https://www.ccflondon.ca/calendrier-communautaire"
+      name: "Carrefour communautaire francophone de london",
+      abbrev: "CCFL",
+      home: "https://www.ccflondon.ca/calendrier-communautaire",
       note: "Not supported: website not sufficiently structured to process"
+    }
   ]
 }

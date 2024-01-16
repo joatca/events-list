@@ -364,8 +364,6 @@ events.select { |e| e.time_from >= earliest && e.time_from < latest }.sort { |a,
            "Today (#{e.time_from.strftime("%a")})"
          elsif days_until == 1
            "Tomorrow (#{e.time_from.strftime("%a")})"
-         elsif days_until < 7
-           e.time_from.strftime("%A")
          elsif e.time_from.year == now.year
            e.time_from.strftime("%a %b %d")
          else
